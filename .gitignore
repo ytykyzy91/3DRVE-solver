@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+env/
+*.egg-info/
+
+# Build / packaging
+build/
+dist/
+
+# Outputs / logs
+outputs/
+*.log
+
+# Large mesh/result files
+*.vtu
+*.vtk
+*.xdmf
+*.h5
+*.hdf5
+
+# Local/editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Claude local settings
+.claude/settings.local.json

@@ -1,0 +1,2561 @@
+{
+    "Defs": {
+        "Version": "474",
+        "Analysis": {
+            "Settings": {
+                "Common": {
+                    "dimension": "2D",
+                    "preprocessor": "GeometryBased",
+                    "outputType": "vtu",
+                    "Analysis": {
+                        "cfd": "0",
+                        "struct": "1",
+                        "dsmc": "0",
+                        "em": "0",
+                        "acoustic": "0",
+                        "sph": "0",
+                        "mbd": "0"
+                    }
+                },
+                "Struct": {
+                    "method": "FEM",
+                    "solver": "Static",
+                    "FEM": {
+                        "absoluteZeroTemperature": "-273.15",
+                        "stefanBoltzmannConstant": "5.67e-8",
+                        "movingThermalSurfaceBC": "0"
+                    }
+                }
+            },
+            "Parameters": {
+                "Common": {
+                    "lengthUnit": "meter",
+                    "autoDT": "1",
+                    "constTimestep": "0",
+                    "maxTime": "0",
+                    "maxIter": "100"
+                },
+                "Struct": {
+                    "nonlinearGeometry": "0",
+                    "totalTime": "1.0",
+                    "incType": "auto",
+                    "nstepMax": "100",
+                    "dt0": "1",
+                    "dtMin": "1e-5",
+                    "dtMax": "1",
+                    "dt": "1",
+                    "nrType": "full",
+                    "mnrIter": "10",
+                    "maxIter": "15",
+                    "rtol": "0",
+                    "rtolu": "0",
+                    "rtolf": "1e-8"
+                }
+            },
+            "PhysicalModels": {
+                "Struct": {
+                    "Crack": {
+                        "enabled": "0",
+                        "initCharSize": "1",
+                        "charMeshSizeEnabled": "1",
+                        "meshRefineLevel": "custom",
+                        "useSize": "0.1",
+                        "crackPropEnabled": "1",
+                        "crackStep": "10",
+                        "c": "2.13e-12",
+                        "m": "3.242"
+                    }
+                }
+            },
+            "Materials": [
+                {
+                    "name": "Glass",
+                    "General": {
+                        "Groups": {
+                            "cfd": "0",
+                            "mechanical": "1",
+                            "thermal": "1",
+                            "em": "0",
+                            "acoustic": "0",
+                            "sph": "0",
+                            "composite": "0",
+                            "dsmc": "0"
+                        },
+                        "density": "2500"
+                    },
+                    "Mechanical": {
+                        "LinearElastic": {
+                            "Isotropic": {
+                                "enabled": "1",
+                                "E": "64.67551307157191",
+                                "nu": "0.2756853142246562",
+                                "temperatureDependent": "0",
+                                "params": [
+                                    {
+                                        "t": "0",
+                                        "E": "64.67551307157191",
+                                        "nu": "0.2756853142246562"
+                                    }
+                                ]
+                            }
+                        },
+                        "Expansion": {
+                            "type": "Isotropic",
+                            "referenceTemperature": "0",
+                            "Isotropic": {
+                                "thermalExpansion": "5e-6"
+                            }
+                        }
+                    },
+                    "Thermal": {
+                        "Conductivity": {
+                            "Isotropic": {
+                                "conductivity": "0.8",
+                                "enabled": "1"
+                            }
+                        },
+                        "SpecificHeat": {
+                            "SpecificHeat": {
+                                "enabled": "1",
+                                "specificHeat": "810"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Epoxy",
+                    "General": {
+                        "Groups": {
+                            "cfd": "0",
+                            "mechanical": "1",
+                            "thermal": "1",
+                            "em": "0",
+                            "acoustic": "0",
+                            "sph": "0",
+                            "composite": "0",
+                            "dsmc": "0"
+                        },
+                        "density": "1900"
+                    },
+                    "Mechanical": {
+                        "LinearElastic": {
+                            "Isotropic": {
+                                "enabled": "1",
+                                "E": "5.835334147234793",
+                                "nu": "0.3382619256824759",
+                                "temperatureDependent": "0",
+                                "params": [
+                                    {
+                                        "t": "0",
+                                        "E": "5.835334147234793",
+                                        "nu": "0.3382619256824759"
+                                    }
+                                ]
+                            }
+                        },
+                        "ViscoElastic": {
+                            "enabled": "1",
+                            "Prony": [
+                                {
+                                    "g": "0.01262",
+                                    "k": "0.01262",
+                                    "tau": "1.0145e-9"
+                                },
+                                {
+                                    "g": "0.02552",
+                                    "k": "0.02552",
+                                    "tau": "1.014e-8"
+                                },
+                                {
+                                    "g": "0.06252",
+                                    "k": "0.06252",
+                                    "tau": "1.014e-7"
+                                },
+                                {
+                                    "g": "0.0768628",
+                                    "k": "0.0768628",
+                                    "tau": "1.0145e-06"
+                                },
+                                {
+                                    "g": "0.128583",
+                                    "k": "0.128583",
+                                    "tau": "1.0145e-05"
+                                },
+                                {
+                                    "g": "0.147175",
+                                    "k": "0.147175",
+                                    "tau": "0.00010145"
+                                },
+                                {
+                                    "g": "0.181631",
+                                    "k": "0.181631",
+                                    "tau": "0.0010145"
+                                },
+                                {
+                                    "g": "0.171479",
+                                    "k": "0.171479",
+                                    "tau": "0.010145"
+                                },
+                                {
+                                    "g": "0.0833645",
+                                    "k": "0.0833645",
+                                    "tau": "0.10145"
+                                },
+                                {
+                                    "g": "0.0348822",
+                                    "k": "0.0348822",
+                                    "tau": "1.0145"
+                                },
+                                {
+                                    "g": "0.0120372",
+                                    "k": "0.0120372",
+                                    "tau": "10.145"
+                                },
+                                {
+                                    "g": "0.00964421",
+                                    "k": "0.00964421",
+                                    "tau": "101.45"
+                                }
+                            ],
+                            "moduliTimeScale": "instantaneous"
+                        },
+                        "Expansion": {
+                            "type": "Isotropic",
+                            "referenceTemperature": "0",
+                            "Isotropic": {
+                                "thermalExpansion": "54.0e-6"
+                            }
+                        }
+                    },
+                    "Thermal": {
+                        "Conductivity": {
+                            "Isotropic": {
+                                "conductivity": "0.2",
+                                "enabled": "1"
+                            }
+                        },
+                        "SpecificHeat": {
+                            "SpecificHeat": {
+                                "enabled": "1",
+                                "specificHeat": "1000"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "CFRP",
+                    "General": {
+                        "Groups": {
+                            "cfd": "0",
+                            "mechanical": "1",
+                            "thermal": "0",
+                            "em": "0",
+                            "acoustic": "0",
+                            "sph": "0",
+                            "composite": "0",
+                            "dsmc": "0"
+                        },
+                        "density": "1550"
+                    },
+                    "Mechanical": {
+                        "LinearElastic": {
+                            "Orthotropic": {
+                                "E1": "9.37439e+10",
+                                "E2": "1.24303e+10",
+                                "E3": "1.24303e+10",
+                                "nu12": "0.274815",
+                                "nu13": "0.274815",
+                                "nu23": "0.368283",
+                                "G12": "4.0536e+09",
+                                "G13": "4.0536e+09",
+                                "G23": "3.19984e+09",
+                                "enabled": "1",
+                                "temperatureDependent": "0",
+                                "params": [
+                                    {
+                                        "t": "0",
+                                        "E1": "9.37439e+10",
+                                        "E2": "1.24303e+10",
+                                        "E3": "1.24303e+10",
+                                        "nu12": "0.274815",
+                                        "nu13": "0.274815",
+                                        "nu23": "0.368283",
+                                        "G12": "4.0536e+09",
+                                        "G13": "4.0536e+09",
+                                        "G23": "3.19984e+09"
+                                    }
+                                ]
+                            }
+                        },
+                        "Expansion": {
+                            "type": "Anisotropic",
+                            "referenceTemperature": "0",
+                            "Anisotropic": {
+                                "a11": "1.1173e-06",
+                                "a22": "3.79481e-05",
+                                "a33": "3.79481e-05",
+                                "a23": "0",
+                                "a13": "0",
+                                "a12": "0"
+                            }
+                        }
+                    }
+                }
+            ],
+            "LayerStacks": [
+                {
+                    "name": "layer-1",
+                    "type": "Dielectric",
+                    "thickness": "0",
+                    "material": "Copper"
+                }
+            ],
+            "BeamProfiles": [
+                {
+                    "name": "beam-rectangular",
+                    "Rectangular": {
+                        "width": "1",
+                        "height": "2"
+                    }
+                }
+            ],
+            "Sections": "",
+            "Orientations": [
+                {
+                    "name": "orientation-1",
+                    "BeamLocalAxis1": {
+                        "enabled": "1",
+                        "x": "0",
+                        "y": "0",
+                        "z": "-1"
+                    }
+                },
+                {
+                    "name": "orientation-2",
+                    "BeamLocalAxis2": {
+                        "enabled": "1",
+                        "x": "0",
+                        "y": "1",
+                        "z": "0"
+                    }
+                }
+            ],
+            "Sources": "",
+            "FieldPoints": {
+                "type": "None"
+            },
+            "CKTs": "",
+            "CableType": "",
+            "Refinement": {
+                "CFD": {
+                    "VR": {
+                        "finestVoxelSize": "1",
+                        "finestLevel": "0",
+                        "boundaryLayerWidth": "5",
+                        "voxelsPerBlock": "4"
+                    },
+                    "AMR": {
+                        "enabled": "0",
+                        "startStep": "0",
+                        "startLevel": "2",
+                        "repeatTimes": "15",
+                        "fastSeedingLevel": "2",
+                        "surfaceNormal": "1",
+                        "strainRate": "1",
+                        "strainRateThreshold": "0.1",
+                        "pressureGradient": "0",
+                        "presGradThreshold": "0.3",
+                        "temperatureGradient": "0",
+                        "tempGradThreshold": "0.3",
+                        "lambda2": "0",
+                        "lambda2min": "0",
+                        "lambda2max": "0.1"
+                    }
+                },
+                "Struct": "null",
+                "EM": "null",
+                "DSMC": {
+                    "coarsestVoxelSize": "2",
+                    "amrRepeatTimes": "5",
+                    "amrInterval": "1000",
+                    "amrMaxLevels": "6"
+                }
+            },
+            "Motions": "",
+            "MotionsGroup": "",
+            "ICs": "",
+            "BCs": "",
+            "Interactions": "",
+            "FieldOutput": {
+                "Common": {
+                    "Output": {
+                        "dumpFrequency": "-1",
+                        "outputAtTimeIntervals": "0",
+                        "timeInterval": "0",
+                        "dumpStartStep": "1"
+                    },
+                    "Restart": {
+                        "restartFromStep": "0",
+                        "restartDumpFrequency": "500",
+                        "restartDumpHours": "5"
+                    }
+                },
+                "Struct": {
+                    "writeConnectorOutput": "0",
+                    "userSpecified": "0",
+                    "variables": ""
+                }
+            },
+            "Samplings": [
+                {
+                    "name": "sampling-1",
+                    "Common": {
+                        "interval": "5"
+                    },
+                    "Struct": {
+                        "historyOutput": "0",
+                        "variables": [
+                            "stress",
+                            "strain",
+                            "displacement"
+                        ]
+                    }
+                },
+                {
+                    "name": "sampling-2",
+                    "Common": {
+                        "interval": "5"
+                    },
+                    "CFD": {
+                        "Common": {
+                            "fieldOutput": "1"
+                        },
+                        "Acoustic": {
+                            "isSourceSurf": "0",
+                            "isOutputSurf": "0",
+                            "isReferenceSurf": "0",
+                            "isDirectMapSurf": "1",
+                            "coupledAnalysis": "0"
+                        }
+                    }
+                }
+            ],
+            "StrainGauge": {
+                "FEResults": {
+                    "currentProj": "1",
+                    "path": ""
+                },
+                "Rosette": [
+                    {
+                        "name": "rosette-1",
+                        "radius": "1",
+                        "length": "1",
+                        "angle1": "0",
+                        "angle2": "45",
+                        "angle3": "90"
+                    }
+                ],
+                "Position": ""
+            },
+            "Amplitudes": [
+                {
+                    "name": "amp-1",
+                    "type": "polyline",
+                    "params": [
+                        {
+                            "t": "0",
+                            "y": "0"
+                        },
+                        {
+                            "t": "0.5",
+                            "y": "0.5"
+                        },
+                        {
+                            "t": "1",
+                            "y": "0.5"
+                        }
+                    ]
+                },
+                {
+                    "name": "fan-curve",
+                    "type": "polyline",
+                    "params": [
+                        {
+                            "t": "0.0",
+                            "y": "0.0"
+                        },
+                        {
+                            "t": "0.5",
+                            "y": "0.5"
+                        },
+                        {
+                            "t": "1.0",
+                            "y": "0.5"
+                        }
+                    ]
+                },
+                {
+                    "name": "heat-curve",
+                    "type": "polyline",
+                    "params": [
+                        {
+                            "t": "0.0",
+                            "y": "0.0"
+                        },
+                        {
+                            "t": "0.5",
+                            "y": "0.5"
+                        },
+                        {
+                            "t": "1.0",
+                            "y": "0.5"
+                        }
+                    ]
+                },
+                {
+                    "name": "function-1",
+                    "type": "polyline",
+                    "params": [
+                        {
+                            "t": "16",
+                            "y": "1"
+                        },
+                        {
+                            "t": "8000",
+                            "y": "1"
+                        }
+                    ]
+                },
+                {
+                    "name": "Distribution_Z",
+                    "type": "polyline",
+                    "params": [
+                        {
+                            "t": "0",
+                            "y": "0.0"
+                        },
+                        {
+                            "t": "50",
+                            "y": "0.1"
+                        },
+                        {
+                            "t": "100",
+                            "y": "1.0"
+                        }
+                    ]
+                }
+            ],
+            "Tables": [
+                {
+                    "name": "table-1",
+                    "columns": [
+                        {
+                            "name": "time",
+                            "label": "time",
+                            "title": "time",
+                            "className": "table-60-overflow-center",
+                            "defValue": "1",
+                            "widgetType": "InputWidget"
+                        },
+                        {
+                            "name": "x",
+                            "label": "x",
+                            "title": "x",
+                            "className": "table-60-overflow-center",
+                            "defValue": "1",
+                            "widgetType": "InputWidget"
+                        },
+                        {
+                            "name": "y",
+                            "label": "y",
+                            "title": "y",
+                            "className": "table-60-overflow-center",
+                            "defValue": "1",
+                            "widgetType": "InputWidget"
+                        },
+                        {
+                            "name": "z",
+                            "label": "z",
+                            "title": "z",
+                            "className": "table-60-overflow-center",
+                            "defValue": "1",
+                            "widgetType": "InputWidget"
+                        }
+                    ],
+                    "data": [
+                        {
+                            "time": "0",
+                            "x": "0",
+                            "y": "0",
+                            "z": "0"
+                        },
+                        {
+                            "time": "0.5",
+                            "x": "0.5",
+                            "y": "0",
+                            "z": "0"
+                        },
+                        {
+                            "time": "1",
+                            "x": "0.5",
+                            "y": "0",
+                            "z": "0"
+                        }
+                    ],
+                    "embeded": "1",
+                    "columnHeaders": [
+                        "time",
+                        "x",
+                        "y",
+                        "z"
+                    ],
+                    "sourceData": [
+                        [
+                            "0",
+                            "0",
+                            "0",
+                            "0"
+                        ],
+                        [
+                            "0.5",
+                            "0.5",
+                            "0",
+                            "0"
+                        ],
+                        [
+                            "1",
+                            "0.5",
+                            "0",
+                            "0"
+                        ]
+                    ],
+                    "type": "user-defined"
+                }
+            ],
+            "SpectrumTable": [
+                {
+                    "name": "psdTable-1",
+                    "tableSize": "5",
+                    "tableData": [
+                        {
+                            "1": "table-1,-",
+                            "2": "table-1,table-1",
+                            "3": "table-1,table-1",
+                            "4": "table-1,table-1",
+                            "5": "table-1,table-1"
+                        },
+                        {
+                            "1": "-,-",
+                            "2": "table-1,-",
+                            "3": "table-1,table-1",
+                            "4": "table-1,table-1",
+                            "5": "table-1,table-1"
+                        },
+                        {
+                            "1": "-,-",
+                            "2": "-,-",
+                            "3": "table-1,-",
+                            "4": "table-1,table-1",
+                            "5": "table-1,table-1"
+                        },
+                        {
+                            "1": "-,-",
+                            "2": "-,-",
+                            "3": "-,-",
+                            "4": "table-1,-",
+                            "5": "table-1,table-1"
+                        },
+                        {
+                            "1": "-,-",
+                            "2": "-,-",
+                            "3": "-,-",
+                            "4": "-,-",
+                            "5": "table-1,-"
+                        }
+                    ]
+                }
+            ],
+            "Expressions": [
+                {
+                    "name": "exp-1",
+                    "expressions": "coef_x = 2*t;/ncoef_y = 0;/ncoef_z = coef_x;"
+                }
+            ],
+            "Fans": "",
+            "Nozzles": "",
+            "ParticleInjections": "",
+            "Ports": [
+                {
+                    "name": "port-1",
+                    "type": "Lumped",
+                    "Lumped": {
+                        "line": "",
+                        "flipDirection": "0",
+                        "face": "",
+                        "Direction": {
+                            "x": "0",
+                            "y": "1",
+                            "z": "0"
+                        }
+                    }
+                }
+            ],
+            "PorousMediums": [
+                {
+                    "name": "pm-1",
+                    "triad": "",
+                    "ViscousResistance": {
+                        "xLocal": "2000.0",
+                        "yLocal": "2000.0",
+                        "zLocal": "2000.0"
+                    },
+                    "InertiaResistance": {
+                        "xLocal": "0.0",
+                        "yLocal": "0.0",
+                        "zLocal": "0.0"
+                    }
+                }
+            ],
+            "Cracks": [
+                {
+                    "name": "crack-1",
+                    "type": "Plane",
+                    "csys": ""
+                }
+            ],
+            "XFEMCracks": [
+                {
+                    "name": "xfem_crack-1",
+                    "propagation": "1"
+                }
+            ],
+            "Bolts": "",
+            "PointMasses": "",
+            "Springs": [
+                {
+                    "name": "spring-1",
+                    "type": "Longitudinal",
+                    "stiffness": "1.0",
+                    "nonlinear": "0",
+                    "mass": "0.0",
+                    "damping": "1",
+                    "orientType": "User-defined",
+                    "OrientVec": {
+                        "x": "1",
+                        "y": "0",
+                        "z": "0"
+                    }
+                }
+            ],
+            "Connectors": [
+                {
+                    "name": "connector-1",
+                    "transType": "Combine",
+                    "rotType": "None",
+                    "orientationA": "",
+                    "orientationB": "",
+                    "Behavior": {
+                        "coupled": "1",
+                        "Elastic": {
+                            "enabled": "1",
+                            "Data": {
+                                "k11": "1.0"
+                            }
+                        },
+                        "ReferenceLength": {
+                            "enabled": "1",
+                            "Data": {
+                                "l1": "1.0"
+                            }
+                        }
+                    }
+                }
+            ],
+            "Dashpots": [
+                {
+                    "name": "dashpot-1",
+                    "type": "Longitudinal",
+                    "coefficient": "1.0",
+                    "nonlinear": "0",
+                    "xfcurve": [
+                        {
+                            "x": "1.0",
+                            "F": "100"
+                        },
+                        {
+                            "x": "2.0",
+                            "F": "200"
+                        }
+                    ],
+                    "mass": "1",
+                    "orientType": "User-defined",
+                    "OrientVec": {
+                        "x": "0",
+                        "y": "1",
+                        "z": "0"
+                    }
+                }
+            ],
+            "Optimization": {
+                "Settings": {
+                    "Struct": {
+                        "type": "None",
+                        "maxIterations": "150",
+                        "considerObjectiveTol": "1",
+                        "objectiveTol": "0.005",
+                        "objectiveConvergenceSteps": "5",
+                        "considerVariableTol": "0",
+                        "convergenceTol": "0.01",
+                        "constraintTol": "0.01",
+                        "movingLimit": "0.2",
+                        "maxChangeOfNDPI": "0.01",
+                        "freezeLoadRegions": "1",
+                        "freezeFixedRegions": "0",
+                        "autoMeshUpAndAmoothing": "1"
+                    }
+                },
+                "Parameters": {
+                    "Struct": {
+                        "interpolationType": "SIMP",
+                        "initPenaltyParam": "3",
+                        "maxPenaltyParam": "3",
+                        "penaltyParamIncSize": "0.2",
+                        "penaltyParamIncFreq": "25",
+                        "rampPenaltyParam": "4",
+                        "filterType": "Density",
+                        "filterRadiusType": "Relative",
+                        "filterRadius": "3",
+                        "projectionType": "Heaviside",
+                        "initBeta": "1",
+                        "maxBeta": "32",
+                        "betaIncSize": "2",
+                        "initBetaMinIter": "25",
+                        "initBetaMaxIter": "50",
+                        "betaMinIter": "10",
+                        "betaIncFreq": "25",
+                        "eta": "0.5"
+                    }
+                },
+                "DesignVariables": "",
+                "DesignResponses": "",
+                "DesignObjective": {
+                    "objectiveType": "Minimize",
+                    "ObjectiveDefinition": [
+                        {
+                            "responseName": "resp2-compliance",
+                            "weight": "1",
+                            "referenceValue": "1"
+                        }
+                    ]
+                },
+                "DesignConstraints": [
+                    {
+                        "responseName": "resp1-volume",
+                        "limitType": "notmorethan",
+                        "limitValue": "0.3"
+                    }
+                ],
+                "GeometryConstraints": "",
+                "Ribs": "",
+                "FeatureParameters": "",
+                "CompositeParameters": "",
+                "BoundaryShapes": "",
+                "LaminateReAnalyses": "",
+                "TopologyPost": {
+                    "inputFile": "../../",
+                    "outputPath": "../../",
+                    "isovalue": "0.5",
+                    "niter": "10",
+                    "reduction": "0.25",
+                    "subdivision": "0",
+                    "enableSpecificStep": "0",
+                    "specificStep": "0"
+                },
+                "LatticePost": {
+                    "latticeSampleRate": "50",
+                    "SDFCoarseSampleRate": "5",
+                    "bodyContactToleranceRatio": "0.03",
+                    "outputResultForEachBody": "0",
+                    "useExactSDF": "0"
+                }
+            },
+            "AcousticWalls": "",
+            "ReportDefs": "",
+            "ReportFileDefs": "",
+            "Batch": {
+                "name": "study-1",
+                "table": "",
+                "sweep": ""
+            },
+            "RunSolver": {
+                "ParallelOptions": {
+                    "backend": "CPU",
+                    "useSMP": "0",
+                    "numThreadsSMP": "1",
+                    "useMPP": "0",
+                    "numProcessesMPP": "1"
+                },
+                "options": "",
+                "Batch": {
+                    "enabled": "0",
+                    "solverType": "Order"
+                }
+            },
+            "RunUserDefinedSolver": {
+                "launchExe": "",
+                "options": "",
+                "isAnalysisJson": "0"
+            },
+            "HoneycombSandwich": "",
+            "Laminates": [
+                {
+                    "name": "Top-laminate",
+                    "type": "topLaminate",
+                    "symmetricPlies": "1",
+                    "Plies": [
+                        {
+                            "label": "Ply-1",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "0",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-2",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "45",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-3",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "-45",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-4",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "90",
+                            "thickness": "0.1"
+                        }
+                    ]
+                },
+                {
+                    "name": "Top-core-laminate",
+                    "type": "topCoreLaminate",
+                    "symmetricPlies": "1",
+                    "Plies": [
+                        {
+                            "label": "Ply-1",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "0",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-2",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "45",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-3",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "-45",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-4",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "90",
+                            "thickness": "0.1"
+                        }
+                    ]
+                },
+                {
+                    "name": "Core-laminate",
+                    "type": "coreLaminate",
+                    "symmetricPlies": "1",
+                    "Plies": [
+                        {
+                            "label": "Ply-1",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "0",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-2",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "45",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-3",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "-45",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-4",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "90",
+                            "thickness": "0.1"
+                        }
+                    ]
+                },
+                {
+                    "name": "Bottom-core-laminate",
+                    "type": "bottomCoreLaminate",
+                    "symmetricPlies": "1",
+                    "Plies": [
+                        {
+                            "label": "Ply-1",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "0",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-2",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "45",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-3",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "-45",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-4",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "90",
+                            "thickness": "0.1"
+                        }
+                    ]
+                },
+                {
+                    "name": "Bottom-laminate",
+                    "type": "bottomLaminate",
+                    "symmetricPlies": "1",
+                    "Plies": [
+                        {
+                            "label": "Ply-1",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "0",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-2",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "45",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-3",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "-45",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-4",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "90",
+                            "thickness": "0.1"
+                        }
+                    ]
+                },
+                {
+                    "name": "Pillar-laminate",
+                    "type": "pillarLaminate",
+                    "symmetricPlies": "1",
+                    "Plies": [
+                        {
+                            "label": "Ply-1",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "0",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-2",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "45",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-3",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "-45",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-4",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "90",
+                            "thickness": "0.1"
+                        }
+                    ]
+                },
+                {
+                    "name": "Laminate-1",
+                    "type": "compositeLaminate",
+                    "symmetricPlies": "1",
+                    "Plies": [
+                        {
+                            "label": "Ply-1",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "0",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-2",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "45",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-3",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "-45",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-4",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "90",
+                            "thickness": "0.1"
+                        }
+                    ]
+                },
+                {
+                    "name": "BCS-3D-Laminate",
+                    "type": "bcsLaminate",
+                    "symmetricPlies": "0",
+                    "Plies": [
+                        {
+                            "label": "Ply-1",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "0",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-2",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "45",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-3",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "-45",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-4",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "90",
+                            "thickness": "0.1"
+                        }
+                    ]
+                },
+                {
+                    "name": "BCS-Profile-Laminate",
+                    "type": "bcsLaminate",
+                    "symmetricPlies": "0",
+                    "Plies": [
+                        {
+                            "label": "Ply-1",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "0",
+                            "thickness": "0.0005"
+                        },
+                        {
+                            "label": "Ply-2",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "45",
+                            "thickness": "0.0005"
+                        },
+                        {
+                            "label": "Ply-3",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "-45",
+                            "thickness": "0.0005"
+                        },
+                        {
+                            "label": "Ply-4",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "90",
+                            "thickness": "0.0005"
+                        }
+                    ]
+                }
+            ],
+            "ConventionalLaminates": [
+                {
+                    "name": "LAYUP-DM_ff",
+                    "axis": "3",
+                    "additional": "0.0",
+                    "type": "compositeLaminate",
+                    "symmetricPlies": "1",
+                    "Plies": [
+                        {
+                            "label": "Ply-1",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "0",
+                            "thickness": "0.2"
+                        },
+                        {
+                            "label": "Ply-2",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "45",
+                            "thickness": "0.2"
+                        },
+                        {
+                            "label": "Ply-3",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "-45",
+                            "thickness": "0.2"
+                        },
+                        {
+                            "label": "Ply-4",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "90",
+                            "thickness": "0.2"
+                        }
+                    ]
+                },
+                {
+                    "name": "composite_freesize",
+                    "axis": "3",
+                    "additional": "0.0",
+                    "type": "compositeLaminate",
+                    "symmetricPlies": "0",
+                    "Plies": [
+                        {
+                            "label": "Ply-1",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "0",
+                            "thickness": "0.2"
+                        },
+                        {
+                            "label": "Ply-2",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "45",
+                            "thickness": "0.2"
+                        },
+                        {
+                            "label": "Ply-3",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "-45",
+                            "thickness": "0.2"
+                        },
+                        {
+                            "label": "Ply-4",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "90",
+                            "thickness": "0.2"
+                        }
+                    ]
+                }
+            ]
+        },
+        "Assignments": "",
+        "AcousticsVersion": "10",
+        "CompositeVersion": "27",
+        "Composite": {
+            "Settings": {
+                "multiMMA": "0",
+                "name": "comp-1",
+                "mmaType": "RVE",
+                "rveType": "userDefined",
+                "mfhType": "MoriTanakaModel",
+                "inclusionType": "continuousFiber",
+                "analyticalModel": "RuleOfMixtures",
+                "boundType": "Hashin",
+                "compositeType": "longFiber",
+                "analysisType": "tmFields",
+                "analysisGroup": "linear",
+                "analysisApproach": "",
+                "rvePath": "case0001_fix.vtu",
+                "TPMS": {
+                    "TPMSType": "P",
+                    "structureType": "Shell"
+                },
+                "TrussLattice": {
+                    "trussLatticeType": "BCC"
+                }
+            },
+            "Materials": {
+                "HoneycombCore": {
+                    "cellSize": "5",
+                    "cellAngle": "30",
+                    "wallThickness": "0.4",
+                    "coreMaterial": "Epoxy"
+                },
+                "reinforcement": "Glass",
+                "VolumeFraction": {
+                    "type": "constant",
+                    "value": "0.4",
+                    "valueRange": [
+                        "0.1",
+                        "0.5"
+                    ],
+                    "valueIncrement": "0.05"
+                },
+                "aspectRatio": "100.0",
+                "orientationTensorType": "UserInput",
+                "OrientationTensor": {
+                    "a11": "0.3333",
+                    "a22": "0.3333",
+                    "a12": "0",
+                    "a13": "0",
+                    "a23": "0"
+                },
+                "orientationTensorINP": "",
+                "orientationTensorO2D": "",
+                "matrix": "Epoxy",
+                "Failure": {
+                    "type": "elastoplasticDamage",
+                    "YMT": "4.5e+7",
+                    "YMC": "1.26e+8",
+                    "TM": "4.0e+7",
+                    "XFT": "5.22e+9",
+                    "XFC": "2.85e+9",
+                    "XT": "2.25e+9",
+                    "XC": "1.6e+9",
+                    "YT": "6.4e+7",
+                    "YC": "2.9e+8",
+                    "ZT": "6.4e+7",
+                    "ZC": "2.9e+8",
+                    "XS": "2.25e+9",
+                    "YS": "6.4e+7",
+                    "ZS": "6.4e+7",
+                    "S12": "9.8e+7",
+                    "S13": "9.8e+7",
+                    "S23": "3e+7",
+                    "compositeType": "GFRP",
+                    "initMisaAngle": "35",
+                    "ITS": "1.0e+7",
+                    "ICS": "1.0e+7",
+                    "SIGMA_YM": "0",
+                    "HM": "0",
+                    "GM2C": "0",
+                    "GM12C": "0",
+                    "DI": {
+                        "DIN": "0",
+                        "DIT1": "0",
+                        "DIT2": "0"
+                    },
+                    "SIMAX": "0"
+                },
+                "Interphase": {
+                    "enabled": "0",
+                    "material": "Epoxy",
+                    "volumeFraction": "0.03"
+                },
+                "Strength": {
+                    "YMT": "4.5e+7",
+                    "TM": "4.0e+7",
+                    "XFT": "5.22e+9",
+                    "XFC": "2.85e+9"
+                },
+                "Fatigue": {
+                    "alpha": "0.473",
+                    "beta": "0.998",
+                    "gamma": "0.81"
+                },
+                "Defect": {
+                    "enabled": "0",
+                    "volumeFraction": "0.01",
+                    "type": "defect",
+                    "material": "Epoxy",
+                    "geometryType": "uniformSphere",
+                    "number": "10"
+                }
+            },
+            "MultiMaterials": "",
+            "Parameters": {
+                "simulationTime": "1.0",
+                "timeIncrement": "0.1",
+                "outputInt": "10",
+                "loadType": "strain",
+                "loadComponent": "uniaxial_11",
+                "loadingAngle": "0",
+                "combinedLoadType": "stress",
+                "Load": {
+                    "type": "constant",
+                    "value": "0.4",
+                    "valueRange": [
+                        "0.1",
+                        "0.5"
+                    ],
+                    "valueIncrement": "0.05"
+                },
+                "temperature": "60",
+                "CyclicLoad": {
+                    "totalLoadingCycles": "100",
+                    "frequency": "1",
+                    "maxLoad": "100",
+                    "rRatio": "0",
+                    "loadingAngle": "0"
+                },
+                "loadGroup": "stress"
+            },
+            "LocalFieldsRecovery": {
+                "tempDeviation": "0",
+                "resinChemStrain": "0",
+                "MacroStrain": {
+                    "epsilon11": "0.01",
+                    "epsilon22": "0",
+                    "epsilon33": "0",
+                    "epsilon12": "0.0",
+                    "epsilon13": "0.0",
+                    "epsilon23": "0"
+                },
+                "MacroElectricFields": {
+                    "e1": "0",
+                    "e2": "0",
+                    "e3": "0"
+                },
+                "MacroMagneticFields": {
+                    "m1": "0",
+                    "m2": "0",
+                    "m3": "0"
+                }
+            },
+            "ConventionalLaminates": [
+                {
+                    "name": "LAYUP-DM_ff",
+                    "axis": "3",
+                    "additional": "0.0",
+                    "type": "compositeLaminate",
+                    "symmetricPlies": "1",
+                    "Plies": [
+                        {
+                            "label": "Ply-1",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "0",
+                            "thickness": "0.2"
+                        },
+                        {
+                            "label": "Ply-2",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "45",
+                            "thickness": "0.2"
+                        },
+                        {
+                            "label": "Ply-3",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "-45",
+                            "thickness": "0.2"
+                        },
+                        {
+                            "label": "Ply-4",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "90",
+                            "thickness": "0.2"
+                        }
+                    ]
+                },
+                {
+                    "name": "composite_freesize",
+                    "axis": "3",
+                    "additional": "0.0",
+                    "type": "compositeLaminate",
+                    "symmetricPlies": "0",
+                    "Plies": [
+                        {
+                            "label": "Ply-1",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "0",
+                            "thickness": "0.2"
+                        },
+                        {
+                            "label": "Ply-2",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "45",
+                            "thickness": "0.2"
+                        },
+                        {
+                            "label": "Ply-3",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "-45",
+                            "thickness": "0.2"
+                        },
+                        {
+                            "label": "Ply-4",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "90",
+                            "thickness": "0.2"
+                        }
+                    ]
+                }
+            ],
+            "Laminates": [
+                {
+                    "name": "Top-laminate",
+                    "type": "topLaminate",
+                    "symmetricPlies": "1",
+                    "Plies": [
+                        {
+                            "label": "Ply-1",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "0",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-2",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "45",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-3",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "-45",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-4",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "90",
+                            "thickness": "0.1"
+                        }
+                    ]
+                },
+                {
+                    "name": "Top-core-laminate",
+                    "type": "topCoreLaminate",
+                    "symmetricPlies": "1",
+                    "Plies": [
+                        {
+                            "label": "Ply-1",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "0",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-2",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "45",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-3",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "-45",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-4",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "90",
+                            "thickness": "0.1"
+                        }
+                    ]
+                },
+                {
+                    "name": "Core-laminate",
+                    "type": "coreLaminate",
+                    "symmetricPlies": "1",
+                    "Plies": [
+                        {
+                            "label": "Ply-1",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "0",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-2",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "45",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-3",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "-45",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-4",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "90",
+                            "thickness": "0.1"
+                        }
+                    ]
+                },
+                {
+                    "name": "Bottom-core-laminate",
+                    "type": "bottomCoreLaminate",
+                    "symmetricPlies": "1",
+                    "Plies": [
+                        {
+                            "label": "Ply-1",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "0",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-2",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "45",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-3",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "-45",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-4",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "90",
+                            "thickness": "0.1"
+                        }
+                    ]
+                },
+                {
+                    "name": "Bottom-laminate",
+                    "type": "bottomLaminate",
+                    "symmetricPlies": "1",
+                    "Plies": [
+                        {
+                            "label": "Ply-1",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "0",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-2",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "45",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-3",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "-45",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-4",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "90",
+                            "thickness": "0.1"
+                        }
+                    ]
+                },
+                {
+                    "name": "Pillar-laminate",
+                    "type": "pillarLaminate",
+                    "symmetricPlies": "1",
+                    "Plies": [
+                        {
+                            "label": "Ply-1",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "0",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-2",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "45",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-3",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "-45",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-4",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "90",
+                            "thickness": "0.1"
+                        }
+                    ]
+                },
+                {
+                    "name": "Laminate-1",
+                    "type": "compositeLaminate",
+                    "symmetricPlies": "1",
+                    "Plies": [
+                        {
+                            "label": "Ply-1",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "0",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-2",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "45",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-3",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "-45",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-4",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "90",
+                            "thickness": "0.1"
+                        }
+                    ]
+                },
+                {
+                    "name": "BCS-3D-Laminate",
+                    "type": "bcsLaminate",
+                    "symmetricPlies": "0",
+                    "Plies": [
+                        {
+                            "label": "Ply-1",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "0",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-2",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "45",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-3",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "-45",
+                            "thickness": "0.1"
+                        },
+                        {
+                            "label": "Ply-4",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "90",
+                            "thickness": "0.1"
+                        }
+                    ]
+                },
+                {
+                    "name": "BCS-Profile-Laminate",
+                    "type": "bcsLaminate",
+                    "symmetricPlies": "0",
+                    "Plies": [
+                        {
+                            "label": "Ply-1",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "0",
+                            "thickness": "0.0005"
+                        },
+                        {
+                            "label": "Ply-2",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "45",
+                            "thickness": "0.0005"
+                        },
+                        {
+                            "label": "Ply-3",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "-45",
+                            "thickness": "0.0005"
+                        },
+                        {
+                            "label": "Ply-4",
+                            "material": "CFRP",
+                            "csys": "",
+                            "integrationPoints": "3",
+                            "rotationAngle": "90",
+                            "thickness": "0.0005"
+                        }
+                    ]
+                }
+            ],
+            "HoneycombSandwiches": [
+                {
+                    "name": "HCSW-1",
+                    "upperSkinLaminate": "Top-laminate",
+                    "coreMaterial": "Honeycomb(24kg/m3)",
+                    "coreThickness": "5",
+                    "coreOrientation": "0",
+                    "lowerSkinLaminate": "Top-laminate"
+                }
+            ],
+            "Panel": {
+                "name": "Panel-1",
+                "groupType": "corrugate",
+                "type": "trusscore",
+                "Dimensions": {
+                    "spacing": "160",
+                    "height": "92"
+                },
+                "topCoreLaminateWidth": "80",
+                "bottomCoreLaminateWidth": "80"
+            },
+            "Beam": {
+                "name": "Beam-1",
+                "analysisType": "elastic",
+                "tempDeviation": "0.0",
+                "Curvature": {
+                    "k1": "0.0",
+                    "k2": "0.0",
+                    "k3": "0.0"
+                },
+                "csys": "",
+                "Recovery": {
+                    "recover3DFields": "0",
+                    "MacroType": "strain",
+                    "MacroStrain": {
+                        "gamma11": "0.0",
+                        "gamma12": "0.0",
+                        "gamma13": "0.0",
+                        "kappa1": "0.0",
+                        "kappa2": "0.0",
+                        "kappa3": "0.0"
+                    },
+                    "dMacroStrain": {
+                        "gamma11": "0.0",
+                        "gamma12": "0.0",
+                        "gamma13": "0.0",
+                        "kappa1": "0.0",
+                        "kappa2": "0.0",
+                        "kappa3": "0.0"
+                    },
+                    "MacroForce": {
+                        "F1": "0.0",
+                        "F2": "0.0",
+                        "F3": "0.0",
+                        "M1": "0.0",
+                        "M2": "0.0",
+                        "M3": "0.0"
+                    },
+                    "MacroDistribForce": {
+                        "F1": "0.0",
+                        "F2": "0.0",
+                        "F3": "0.0",
+                        "M1": "0.0",
+                        "M2": "0.0",
+                        "M3": "0.0"
+                    },
+                    "MacroDisp": {
+                        "u1": "0.0",
+                        "u2": "0.0",
+                        "u3": "0.0"
+                    },
+                    "MacroRot": {
+                        "11": "1.0",
+                        "12": "0.0",
+                        "13": "0.0",
+                        "21": "0.0",
+                        "22": "1.0",
+                        "23": "0.0",
+                        "31": "0.0",
+                        "32": "0.0",
+                        "33": "1.0"
+                    }
+                }
+            },
+            "PerformMapping": {
+                "inputMesh": "",
+                "outputMesh": ""
+            },
+            "SetElementMaterials": {
+                "fiberMaterial": "Glass",
+                "fiberVolumeFraction": "0.2",
+                "fiberAspectRatio": "10",
+                "matrixMaterial": "Epoxy"
+            },
+            "DefineTestMatrix": {
+                "Laminates": [
+                    {
+                        "laminate": "Top-laminate"
+                    }
+                ],
+                "Tests": {
+                    "unnotchedTension": "1",
+                    "unnotchedCompression": "1",
+                    "openHoleTension": "1",
+                    "openHoleCompression": "1",
+                    "laminateLength": "300",
+                    "specimenType": "NoHolding",
+                    "holdingLength": "90",
+                    "centerLength": "30",
+                    "laminateWidth": "36",
+                    "holeDiameter": "8",
+                    "incType": "auto",
+                    "nstepMax": "600",
+                    "dtMax": "1",
+                    "dt0": "1e-4",
+                    "dtMin": "1e-8",
+                    "dt": "1e-2",
+                    "incrementMaxNum": "100",
+                    "tractionLoad": "0.1"
+                },
+                "Environments": [
+                    {
+                        "name": "RTD",
+                        "temperature": "25",
+                        "humidity": "0"
+                    }
+                ]
+            },
+            "DefineVariability": {
+                "numberOfBatches": "1",
+                "numberOfPanels": "1",
+                "numberOfSpecimens": "1"
+            },
+            "VirtualTesting": {
+                "loadingType": "3PointBending",
+                "length": "1000",
+                "diameter": "40",
+                "la": "50",
+                "lb": "100",
+                "lc": "100",
+                "sandwichWidth": "100",
+                "loadPadWidth": "5",
+                "loadF": "100",
+                "shearStrain": "0.1"
+            },
+            "RunAnalysis": {
+                "type": "MMA",
+                "options": ""
+            },
+            "RunSolver": {
+                "material": "notSpecified",
+                "gCode": ""
+            },
+            "Weave": {
+                "dimension": "2D",
+                "analyticalType": "0",
+                "weaveType": "twillweave",
+                "Yarns": {
+                    "reinforcement": "Glass",
+                    "matrix": "Epoxy",
+                    "num": "1",
+                    "fillingRate": "0.648",
+                    "width": "1.67",
+                    "thickness": "0.26",
+                    "weavingAngle": "45"
+                },
+                "WeftYarn": {
+                    "reinforcement": "Glass",
+                    "matrix": "Epoxy",
+                    "num": "1",
+                    "fillingRate": "0.648",
+                    "width": "1.67",
+                    "thickness": "0.26",
+                    "weavingAngle": "45"
+                },
+                "WarpYarn": {
+                    "reinforcement": "Glass",
+                    "matrix": "Epoxy",
+                    "num": "1",
+                    "fillingRate": "0.648",
+                    "width": "1.67",
+                    "thickness": "0.26",
+                    "weavingAngle": "45"
+                },
+                "domain": {
+                    "totalThickness": "0.92"
+                }
+            },
+            "BeamCrossSections": "",
+            "BeamCrossSection2D": {
+                "name": "",
+                "type": "Profile",
+                "bladeModelId": "",
+                "leadingEdgeId": "",
+                "offset": "1200",
+                "prflBodyId": "",
+                "C": "1",
+                "TETA": "1",
+                "YREF0": "1",
+                "ZREF0": "1",
+                "nonTypical": "0",
+                "ifManualCS": "0",
+                "manualCSYy": "0",
+                "manualCSYz": "1",
+                "varAbsDime": "0",
+                "ifVarnish": "1",
+                "varFull": "0",
+                "VarnishesFull": [
+                    {
+                        "varThick": "0.002",
+                        "material": "Steel"
+                    }
+                ],
+                "VarnishesHalf": [
+                    {
+                        "varUp": "1",
+                        "varThick": "0.002",
+                        "startRatio": "0.40",
+                        "endRatio": "0.45",
+                        "material": "Steel"
+                    },
+                    {
+                        "varUp": "0",
+                        "varThick": "0.002",
+                        "startRatio": "0.41",
+                        "endRatio": "0.46",
+                        "material": "Steel"
+                    }
+                ],
+                "esAbsDime": "0",
+                "ifErsSteel": "1",
+                "upBrkRatio": "0.13",
+                "downBrkRatio": "0.10",
+                "esLaminate": "BCS-Profile-Laminate",
+                "esLamStart": "A-side",
+                "esThick": "0",
+                "esFilmLaminate": "BCS-Profile-Laminate",
+                "esFilmLamStart": "A-side",
+                "esFilmThick": "0",
+                "ifFill": "1",
+                "upFillRatio": "0.15",
+                "downFillRatio": "0.12",
+                "FillUpPts": [
+                    {
+                        "x": "0.144",
+                        "y": "0.045"
+                    },
+                    {
+                        "x": "0.136",
+                        "y": "0.0435"
+                    }
+                ],
+                "esFillUpMat": "Steel",
+                "FillDownPts": [
+                    {
+                        "x": "0.114",
+                        "y": "-0.0135"
+                    },
+                    {
+                        "x": "0.108",
+                        "y": "-0.0132"
+                    }
+                ],
+                "esFillDownMat": "Steel",
+                "lamAbsDime": "0",
+                "LamThicks": [
+                    {
+                        "laminate": "BCS-Profile-Laminate",
+                        "laminateStart": "A-side",
+                        "thickness": "0",
+                        "ifFull": "1",
+                        "halfLamPos": "3",
+                        "startRatio": "0.0",
+                        "endRatio": "0.0"
+                    },
+                    {
+                        "laminate": "BCS-Profile-Laminate",
+                        "laminateStart": "A-side",
+                        "thickness": "0",
+                        "ifFull": "0",
+                        "halfLamPos": "1",
+                        "startRatio": "0.20",
+                        "endRatio": "0.23"
+                    },
+                    {
+                        "laminate": "BCS-Profile-Laminate",
+                        "laminateStart": "A-side",
+                        "thickness": "0",
+                        "ifFull": "1",
+                        "halfLamPos": "3",
+                        "startRatio": "0.0",
+                        "endRatio": "0.0"
+                    },
+                    {
+                        "laminate": "BCS-Profile-Laminate",
+                        "laminateStart": "A-side",
+                        "thickness": "0",
+                        "ifFull": "0",
+                        "halfLamPos": "1",
+                        "startRatio": "0.17",
+                        "endRatio": "0.19"
+                    },
+                    {
+                        "laminate": "BCS-Profile-Laminate",
+                        "laminateStart": "A-side",
+                        "thickness": "0",
+                        "ifFull": "0",
+                        "halfLamPos": "3",
+                        "startRatio": "0.21",
+                        "endRatio": "0.25"
+                    },
+                    {
+                        "laminate": "BCS-Profile-Laminate",
+                        "laminateStart": "A-side",
+                        "thickness": "0",
+                        "ifFull": "1",
+                        "halfLamPos": "3",
+                        "startRatio": "0.0",
+                        "endRatio": "0.0"
+                    }
+                ],
+                "beamAbsDime": "0",
+                "beamType": "BeamC",
+                "BeamC": {
+                    "ctrlStart": "0.18",
+                    "CtrlPoints": [
+                        {
+                            "x": "0.17",
+                            "y": "0.025"
+                        },
+                        {
+                            "x": "0.166",
+                            "y": "0.01"
+                        },
+                        {
+                            "x": "0.17",
+                            "y": "0.0"
+                        },
+                        {
+                            "x": "0.18",
+                            "y": "-0.005"
+                        }
+                    ],
+                    "ctrlEnd": "0.20",
+                    "material": "Steel"
+                },
+                "BeamD": {
+                    "Left": {
+                        "ctrlStart": "0.14",
+                        "CtrlPoints": [
+                            {
+                                "x": "0.12",
+                                "y": "0.02"
+                            },
+                            {
+                                "x": "0.115",
+                                "y": "0.01"
+                            },
+                            {
+                                "x": "0.12",
+                                "y": "0.0"
+                            },
+                            {
+                                "x": "0.123",
+                                "y": "-0.005"
+                            }
+                        ],
+                        "ctrlEnd": "0.13"
+                    },
+                    "Right": {
+                        "ctrlStart": "0.30",
+                        "CtrlPoints": [
+                            {
+                                "x": "0.32",
+                                "y": "0.03"
+                            },
+                            {
+                                "x": "0.33",
+                                "y": "0.01"
+                            },
+                            {
+                                "x": "0.33",
+                                "y": "0.0"
+                            },
+                            {
+                                "x": "0.32",
+                                "y": "-0.005"
+                            }
+                        ],
+                        "ctrlEnd": "0.32"
+                    },
+                    "laminate": "BCS-Profile-Laminate",
+                    "laminateStart": "A-side",
+                    "bdThick": "0",
+                    "leftMat": "Steel",
+                    "BeamDLams": [
+                        {
+                            "laminate": "BCS-Profile-Laminate",
+                            "laminateStart": "A-side",
+                            "thick": "0",
+                            "ifFull": "1",
+                            "ifUp": "0",
+                            "startRatio": "0.0",
+                            "endRatio": "0.0"
+                        },
+                        {
+                            "laminate": "BCS-Profile-Laminate",
+                            "laminateStart": "A-side",
+                            "thick": "0",
+                            "ifFull": "0",
+                            "ifUp": "1",
+                            "startRatio": "0.20",
+                            "endRatio": "0.23"
+                        },
+                        {
+                            "laminate": "BCS-Profile-Laminate",
+                            "laminateStart": "A-side",
+                            "thick": "0",
+                            "ifFull": "1",
+                            "ifUp": "0",
+                            "startRatio": "0.0",
+                            "endRatio": "0.0"
+                        },
+                        {
+                            "laminate": "BCS-Profile-Laminate",
+                            "laminateStart": "A-side",
+                            "thick": "0",
+                            "ifFull": "0",
+                            "ifUp": "1",
+                            "startRatio": "0.19",
+                            "endRatio": "0.22"
+                        },
+                        {
+                            "laminate": "BCS-Profile-Laminate",
+                            "laminateStart": "A-side",
+                            "thick": "0",
+                            "ifFull": "0",
+                            "ifUp": "0",
+                            "startRatio": "0.14",
+                            "endRatio": "0.16"
+                        },
+                        {
+                            "laminate": "BCS-Profile-Laminate",
+                            "laminateStart": "A-side",
+                            "thick": "0",
+                            "ifFull": "0",
+                            "ifUp": "0",
+                            "startRatio": "0.22",
+                            "endRatio": "0.24"
+                        },
+                        {
+                            "laminate": "BCS-Profile-Laminate",
+                            "laminateStart": "A-side",
+                            "thick": "0",
+                            "ifFull": "1",
+                            "ifUp": "0",
+                            "startRatio": "0.0",
+                            "endRatio": "0.0"
+                        }
+                    ],
+                    "material": "Steel"
+                },
+                "ribAbsDime": "0",
+                "Ribs": [
+                    {
+                        "type": "0",
+                        "upStart": "0.35",
+                        "upEnd": "0.45",
+                        "downStart": "0.35",
+                        "downEnd": "0.45",
+                        "laminate": "BCS-Profile-Laminate",
+                        "laminateStart": "A-side",
+                        "thickness": "0",
+                        "leftFillMat": "Steel"
+                    },
+                    {
+                        "type": "1",
+                        "upStart": "0.48",
+                        "upEnd": "0.53",
+                        "downStart": "0.47",
+                        "downEnd": "0.52",
+                        "laminate": "BCS-Profile-Laminate",
+                        "laminateStart": "A-side",
+                        "thickness": "0",
+                        "leftFillMat": "Steel"
+                    },
+                    {
+                        "type": "2",
+                        "upStart": "0.55",
+                        "upEnd": "0.62",
+                        "downStart": "0.54",
+                        "downEnd": "0.59",
+                        "laminate": "BCS-Profile-Laminate",
+                        "laminateStart": "A-side",
+                        "thickness": "0",
+                        "leftFillMat": "Steel"
+                    },
+                    {
+                        "type": "3",
+                        "upStart": "0.64",
+                        "upEnd": "0.69",
+                        "downStart": "0.60",
+                        "downEnd": "0.65",
+                        "laminate": "BCS-Profile-Laminate",
+                        "laminateStart": "A-side",
+                        "thickness": "0",
+                        "leftFillMat": "Steel"
+                    },
+                    {
+                        "type": "4",
+                        "up": "0.72",
+                        "CtrlPts": [
+                            {
+                                "x": "0.70",
+                                "y": "0.005"
+                            },
+                            {
+                                "x": "0.70",
+                                "y": "0.002"
+                            }
+                        ],
+                        "down": "0.72",
+                        "laminate": "BCS-Profile-Laminate",
+                        "laminateStart": "A-side",
+                        "thickness": "0",
+                        "leftFillMat": "Steel"
+                    }
+                ],
+                "ifHole": "1",
+                "holeAbsDime": "0",
+                "holeType": "Circle",
+                "holeX": "0.08",
+                "holeY": "0.01",
+                "holeR": "0.01",
+                "PolyPts": [
+                    {
+                        "x": "0.088",
+                        "y": "0.015"
+                    },
+                    {
+                        "x": "0.071",
+                        "y": "0.015"
+                    },
+                    {
+                        "x": "0.08",
+                        "y": "0.0"
+                    }
+                ],
+                "holeMaterial": "Steel",
+                "ifTrailingEdge": "1",
+                "teAbsDime": "0",
+                "teUp": "0.80",
+                "TeCtrlPts": [
+                    {
+                        "x": "0.82",
+                        "y": "0.005"
+                    },
+                    {
+                        "x": "0.82",
+                        "y": "0.002"
+                    }
+                ],
+                "teDown": "0.80",
+                "teMaterial": "Steel",
+                "teLeftFillMat": "Steel"
+            },
+            "BCS3DParameters": {
+                "XROTOR": "1",
+                "XF": "1",
+                "XL": "1",
+                "OMEGA": "1"
+            },
+            "BCS3DLoad": {
+                "operatingMode": ""
+            },
+            "Beams": {
+                "loadcase": "",
+                "loadcaseDir": ""
+            }
+        },
+        "MeshingVersion": "14",
+        "MBDVersion": "15",
+        "MultiphysicsVersion": "1",
+        "Multiphysics": {
+            "BasicAnalysis": ""
+        },
+        "AIWorkshopVersion": "5",
+        "FatigueVersion": "5",
+        "MultiVersion": "2",
+        "PCBVersion": "1",
+        "PCB": "",
+        "defaultPCBValues": "",
+        "OpticsVersion": "1",
+        "UnderwaterAcousticsVersion": "1",
+        "Expressions": ""
+    },
+    "Model": {
+        "Meta": {
+            "projectName": "user_RVE",
+            "projectDir": ".",
+            "geometryFile": "",
+            "geometryParsed": "",
+            "meshFile": "",
+            "meshImport": "",
+            "solverJson": "",
+            "resultFile": ""
+        },
+        "Hierarchy": {
+            "nbody": "0",
+            "bodies": ""
+        }
+    }
+}
