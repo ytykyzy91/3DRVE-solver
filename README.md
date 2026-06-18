@@ -85,12 +85,15 @@ src/rve_vam/
     tet4.py           # 四面体接口占位
 
 tests/                # 单元测试和小型验证
-run_rve.bat           # Windows 一键运行脚本
+run_rve_py39.bat           # Windows 一键运行脚本
 ```
 
 ## 环境要求
 
-推荐 Python 3.10+。
+**推荐 Python 3.9** (通过 conda 环境)。
+
+- Python 3.10+ 也可以，但 scipy 导入会显著变慢
+- Python 3.14 测试发现导入极慢，不推荐
 
 依赖：
 
@@ -106,9 +109,10 @@ meshio
 pytest
 ```
 
-安装方式：
+安装方式（conda py39 环境）：
 
 ```bat
+conda activate py39
 python -m pip install numpy scipy meshio pytest
 ```
 
@@ -123,19 +127,21 @@ python -m pip install -e .
 项目根目录下提供了：
 
 ```bat
-run_rve.bat
+run_rve_py39.bat
 ```
+
+该脚本会自动激活 conda 的 py39 环境。
 
 ### 1. 查看帮助
 
 ```bat
-run_rve.bat help
+run_rve_py39.bat help
 ```
 
 ### 2. 只解析输入并打印摘要
 
 ```bat
-run_rve.bat summary
+run_rve_py39.bat summary
 ```
 
 该命令会输出网格规模、bounds、Material ID 分布和材料映射，不执行大规模求解。
@@ -143,7 +149,7 @@ run_rve.bat summary
 ### 3. 运行小型内置验证
 
 ```bat
-run_rve.bat test
+run_rve_py39.bat test
 ```
 
 该命令会：
@@ -156,7 +162,7 @@ run_rve.bat test
 ### 4. 运行示例 RVE 求解
 
 ```bat
-run_rve.bat run
+run_rve_py39.bat run
 ```
 
 默认使用：
@@ -177,7 +183,7 @@ outputs/case0001/
 ### 5. 运行 1,000,000 级网格推荐配置
 
 ```bat
-run_rve.bat large
+run_rve_py39.bat large
 ```
 
 默认使用：
@@ -327,7 +333,34 @@ stiffness_cache_misses
 --solver spsolve
 ```
 
-### 5. 内存规模提醒
+### 5. 线性求解器选择
+
+当前支持三种求解器，性能差异很大：
+
+| 求解器 | 命令 | 特点 | 适用场景 | 65万自由度预估时间 |
+|--------|------|------|----------|-------------------|
+| **SPLU (默认)** | `--solver splu` | 稀疏LU分解，多RHS一次求解 | 中小规模 (≤100万自由度) | **~2-3分钟** |
+| CG并行 | `--solver cg` | 共轭梯度迭代 + 6方向并行 | 大规模 (≥100万自由度) | ~17分钟 |
+| CG串行 | `--solver cg --no-parallel` | 共轭梯度迭代 | 内存极度受限 | ~30分钟 |
+| spsolve | `--solver spsolve` | umfpack直接法 | 调试/极小网格 | - |
+
+**推荐方案：**
+- **65万自由度及以下**：用默认 `splu`，速度最快（一次分解 + 6次回代）
+- **100万自由度以上**：如果 SPLU 内存不足（需要约 10-15GB），改用 `--solver cg`
+
+### 6. 6个均质化方向并行求解
+
+6个宏观应变方向彼此独立，可以并行求解。
+
+**注意：并行仅对迭代求解器 `cg` 生效。`splu` 内部已优化多RHS求解，无需额外并行。**
+
+启用/禁用并行：
+```bat
+--solver cg --parallel-workers 6      (默认: 6个worker)
+--solver cg --no-parallel              (禁用并行，串行求解)
+```
+
+### 7. 内存规模提醒
 
 百万级 Hex8 网格的完整单元条目规模约为：
 
@@ -453,7 +486,7 @@ python -m rve_vam.cli ^
 如果只指定：
 
 ```bat
-run_rve.bat fields
+run_rve_py39.bat fields
 ```
 
 程序会从以下路径读取默认宏观应变：
@@ -540,7 +573,7 @@ outputs/case0001/macro_strain_analysis.json
 
 ### fields 模式是否额外输出均质化 stiffness.json/csv
 
-默认情况下，`--write-fields` / `run_rve.bat fields` **只做宏观应变场分析并写 VTU**，不会再额外做 6 个方向的均质化求解，因此速度更快。
+默认情况下，`--write-fields` / `run_rve_py39.bat fields` **只做宏观应变场分析并写 VTU**，不会再额外做 6 个方向的均质化求解，因此速度更快。
 
 如果你需要在 fields 模式后同时输出均质化结果：
 
@@ -556,7 +589,7 @@ python -m rve_vam.cli ^
 或使用：
 
 ```bat
-run_rve.bat fields-homogenization
+run_rve_py39.bat fields-homogenization
 ```
 
 该选项会额外进行 6 个单位宏观应变方向的求解，并输出：
@@ -601,7 +634,7 @@ python -m pytest -q
 如果未安装 `pytest`，可运行：
 
 ```bat
-run_rve.bat test
+run_rve_py39.bat test
 ```
 
 ## 当前限制与后续扩展
