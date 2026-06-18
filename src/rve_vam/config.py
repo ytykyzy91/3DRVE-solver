@@ -35,7 +35,7 @@ class SolverOptions:
     material_mapping_mode: str = "auto"
     material_id_map: dict[int, str] | None = None
     pbc_tolerance: float = 1e-8
-    solver: str = "spsolve"
+    solver: str = "cg"
     symmetrize: bool = True
     assembly_chunk_size: int = 20000
     assembly_mode: str = "reduced"
@@ -46,5 +46,7 @@ class SolverOptions:
     affine_origin: str = "zero"
     parallel: bool = True
     parallel_workers: int = 6
+    solver_rtol: float = 1e-6
+    cg_preconditioner: str = "ilu"
     log_file: Path | None = None
     log_level: str = "INFO"

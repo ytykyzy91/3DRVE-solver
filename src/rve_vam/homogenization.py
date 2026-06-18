@@ -75,6 +75,8 @@ def solve_macro_case(
     macro_strain: np.ndarray,
     solver: str,
     affine_reference: np.ndarray | None = None,
+    solver_rtol: float = 1e-6,
+    cg_preconditioner: str = "ilu",
 ) -> tuple[np.ndarray, float, float]:
     T = pbc_map.transformation
     u_macro = affine_displacement(mesh.points, macro_strain, reference_point=affine_reference)
@@ -85,7 +87,10 @@ def solve_macro_case(
     q = np.zeros(K_reduced.shape[0], dtype=float)
     K_free = K_reduced[free][:, free].tocsr()
     rhs_free = np.asarray(rhs_reduced[free], dtype=float)
-    solve = solve_linear_system(K_free, rhs_free, method=solver, context="homogenization/full")
+    solve = solve_linear_system(
+        K_free, rhs_free, method=solver, context="homogenization/full",
+        rtol=solver_rtol, precondition=cg_preconditioner,
+    )
     q[free] = solve.x
     displacement = u_macro + T @ q
     sigma_avg, volume = average_stress(mesh, phase_mapping, displacement)
@@ -104,6 +109,8 @@ def _solve_single_case(
     macro_strain: np.ndarray,
     solver: str,
     affine_reference: np.ndarray | None = None,
+    solver_rtol: float = 1e-6,
+    cg_preconditioner: str = "ilu",
 ) -> tuple[int, np.ndarray, float, float]:
     """Solve a single homogenization case (for parallel execution)."""
     solve = solve_linear_system(
@@ -111,6 +118,8 @@ def _solve_single_case(
         rhs,
         method=solver,
         context=f"homogenization {case_idx + 1}/6 {label}",
+        rtol=solver_rtol,
+        precondition=cg_preconditioner,
     )
     q = np.zeros(T.shape[1], dtype=float)
     q[free] = solve.x
@@ -127,6 +136,7 @@ def _solve_multiple_cases(
     mesh: Mesh,
     phase_mapping: PhaseMapping,
     affine_reference: np.ndarray | None,
+    solver_rtol: float = 1e-6,
 ) -> tuple[list[np.ndarray], list[float], list[float]]:
     """Solve multiple RHS at once using direct solver (multi-RHS optimization)."""
     columns: list[np.ndarray] = []
@@ -134,7 +144,7 @@ def _solve_multiple_cases(
     volumes: list[float] = []
 
     # Solve all 6 RHS at once
-    solve = solve_linear_system(K, rhs_multi, method="splu", context="homogenization multi-RHS")
+    solve = solve_linear_system(K, rhs_multi, method="splu", context="homogenization multi-RHS", rtol=solver_rtol)
     q_all = np.zeros((T.shape[1], 6), dtype=float)
     q_all[free, :] = solve.x
 
@@ -163,6 +173,8 @@ def _solve_from_reduced_assembly(
     affine_reference: np.ndarray | None = None,
     parallel: bool = True,
     max_workers: int = 6,
+    solver_rtol: float = 1e-6,
+    cg_preconditioner: str = "ilu",
 ) -> tuple[list[np.ndarray], list[float], list[float]]:
     columns: list[np.ndarray] = [None] * 6  # type: ignore[list-item]
     residuals: list[float] = [0.0] * 6
@@ -173,7 +185,7 @@ def _solve_from_reduced_assembly(
     # For direct solvers: use multi-RHS optimization (fastest)
     if solver == "splu":
         logger.info("Using Sparse LU multi-RHS solve for all 6 cases")
-        return _solve_multiple_cases(reduced.K, reduced.macro_rhs, T, free, mesh, phase_mapping, affine_reference)
+        return _solve_multiple_cases(reduced.K, reduced.macro_rhs, T, free, mesh, phase_mapping, affine_reference, solver_rtol)
 
     # For iterative solvers: use parallel or serial
     if parallel and max_workers > 1:
@@ -195,6 +207,8 @@ def _solve_from_reduced_assembly(
                     macro_strain,
                     solver,
                     affine_reference,
+                    solver_rtol,
+                    cg_preconditioner,
                 )
                 futures[future] = case_idx
 
@@ -227,6 +241,8 @@ def _solve_from_reduced_assembly(
                 macro_strain,
                 solver,
                 affine_reference,
+                solver_rtol,
+                cg_preconditioner,
             )
             columns[case_idx] = sigma_avg
             residuals[case_idx] = residual
@@ -241,7 +257,7 @@ def homogenize_mesh(
     phase_mapping: PhaseMapping,
     *,
     pbc_tolerance: float = 1e-8,
-    solver: str = "spsolve",
+    solver: str = "cg",
     symmetrize: bool = True,
     assembly_chunk_size: int = 20000,
     assembly_mode: str = "reduced",
@@ -251,10 +267,14 @@ def homogenize_mesh(
     affine_origin: str = "zero",
     parallel: bool = True,
     parallel_workers: int = 6,
+    solver_rtol: float = 1e-6,
+    cg_preconditioner: str = "ilu",
 ) -> HomogenizationResult:
     mode_desc = "PARALLEL" if parallel and parallel_workers > 1 else "SERIAL"
-    logger.info("Starting homogenization: cells=%d, points=%d, assembly_mode=%s, solver=%s, mode=%s, workers=%d",
-                mesh.n_cells, mesh.n_points, assembly_mode, solver, mode_desc, parallel_workers if parallel else 1)
+    precond_desc = f", precond={cg_preconditioner}, rtol={solver_rtol:.1e}" if solver == "cg" else ""
+    logger.info("Starting homogenization: cells=%d, points=%d, assembly_mode=%s, solver=%s, mode=%s, workers=%d%s",
+                mesh.n_cells, mesh.n_points, assembly_mode, solver, mode_desc,
+                parallel_workers if parallel else 1, precond_desc)
     total_start = time.perf_counter()
     logger.info("Building periodic DOF map")
     pbc_start = time.perf_counter()
@@ -286,7 +306,8 @@ def homogenize_mesh(
         )
         columns, residuals, case_volumes = _solve_from_reduced_assembly(
             reduced, pbc_map, mesh, phase_mapping, solver, affine_reference=affine_ref,
-            parallel=parallel, max_workers=parallel_workers
+            parallel=parallel, max_workers=parallel_workers,
+            solver_rtol=solver_rtol, cg_preconditioner=cg_preconditioner,
         )
         assembly_volume = reduced.total_element_volume
         phase_volume_fractions = reduced.phase_volume_fractions
@@ -307,7 +328,9 @@ def homogenize_mesh(
             label = MACRO_STRAIN_LABELS[case_idx]
             logger.info("Starting homogenization full solve %d/6: %s", case_idx + 1, label)
             sigma_avg, residual, volume = solve_macro_case(
-                assembly.K, pbc_map, mesh, phase_mapping, macro_strain, solver, affine_reference=affine_ref
+                assembly.K, pbc_map, mesh, phase_mapping, macro_strain, solver,
+                affine_reference=affine_ref, solver_rtol=solver_rtol,
+                cg_preconditioner=cg_preconditioner,
             )
             logger.info("Completed homogenization full solve %d/6: %s, residual=%.6e", case_idx + 1, label, residual)
             columns.append(sigma_avg)
@@ -372,6 +395,8 @@ def run_homogenization(options: SolverOptions) -> HomogenizationResult:
         affine_origin=options.affine_origin,
         parallel=options.parallel,
         parallel_workers=options.parallel_workers,
+        solver_rtol=options.solver_rtol,
+        cg_preconditioner=options.cg_preconditioner,
     )
 
 

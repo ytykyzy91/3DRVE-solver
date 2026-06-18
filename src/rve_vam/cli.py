@@ -34,7 +34,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--material-id-map", help="Explicit map, e.g. 1:matrix,2:reinforcement")
     parser.add_argument("--pbc-tol", default=1e-8, type=float, help="Periodic node pairing tolerance")
     parser.add_argument("--affine-origin", default="zero", choices=["zero", "min", "center"], help="Reference point for affine macro displacement E*(X-Xref)")
-    parser.add_argument("--solver", default="splu", choices=["spsolve", "splu", "cg"], help="Sparse linear solver (splu=Sparse LU, recommended for fastest results)")
+    parser.add_argument("--solver", default="cg", choices=["spsolve", "splu", "cg"], help="Sparse linear solver (default: cg with ILU preconditioner, fastest for elasticity problems)")
     parser.add_argument("--assembly-mode", default="reduced", choices=["reduced", "full"], help="Assemble directly in periodic reduced space or assemble full K first")
     parser.add_argument("--assembly-chunk-size", default=20000, type=int, help="Elements per sparse assembly chunk")
     parser.add_argument("--stiffness-cache-size", default=4096, type=int, help="Max cached element stiffness patterns; 0 disables cache")
@@ -55,6 +55,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--log-level", default="INFO", choices=["DEBUG", "INFO", "WARNING", "ERROR"], help="Logging level")
     parser.add_argument("--no-parallel", action="store_true", help="Disable parallel solving of 6 homogenization cases")
     parser.add_argument("--parallel-workers", default=6, type=int, help="Number of parallel workers for homogenization (default: 6, one per case)")
+    parser.add_argument("--solver-rtol", default=1e-6, type=float, help="Relative tolerance for iterative solvers (default: 1e-6, was 1e-10)")
+    parser.add_argument("--cg-preconditioner", default="ilu", choices=["ilu", "jacobi", "none"], help="CG preconditioner (default: ilu = incomplete LU, fastest for elasticity)")
     return parser
 
 
@@ -145,6 +147,8 @@ def main(argv: list[str] | None = None) -> int:
         macro_strain_analysis=macro_analysis,
         parallel=not args.no_parallel,
         parallel_workers=args.parallel_workers,
+        solver_rtol=args.solver_rtol,
+        cg_preconditioner=args.cg_preconditioner,
         log_file=log_path,
         log_level=args.log_level,
     )

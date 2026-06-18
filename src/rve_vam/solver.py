@@ -21,9 +21,10 @@ class LinearSolveResult:
 def solve_linear_system(
     matrix: sp.spmatrix,
     rhs: np.ndarray,
-    method: str = "spsolve",
+    method: str = "cg",
     context: str = "",
-    rtol: float = 1e-8,
+    rtol: float = 1e-6,
+    precondition: str = "ilu",
 ) -> LinearSolveResult:
     a = matrix.tocsr()
     b = np.asarray(rhs, dtype=float)
@@ -39,8 +40,8 @@ def solve_linear_system(
     else:
         b_norm = float(np.linalg.norm(b))
 
-    logger.info("Starting linear solve%s: method=%s, shape=%s, nnz=%d, rhs_norm=%.6e, multi_rhs=%s",
-                label, method, a.shape, a.nnz, b_norm, is_multi_rhs)
+    logger.info("Starting linear solve%s: method=%s, shape=%s, nnz=%d, rhs_norm=%.6e, rtol=%.1e, multi_rhs=%s",
+                label, method, a.shape, a.nnz, b_norm, rtol, is_multi_rhs)
     start = time.perf_counter()
 
     if method == "spsolve":
@@ -59,8 +60,27 @@ def solve_linear_system(
         logger.info("Backward/forward substitution completed in %.2fs", solve_time)
         info = None
     elif method == "cg":
-        # Use relaxed tolerance for homogenization
-        x, info = spla.cg(a, b, rtol=rtol, atol=0.0, maxiter=10000)
+        # Build preconditioner if requested
+        M = None
+        if precondition == "ilu":
+            ilu_start = time.perf_counter()
+            logger.info("Building ILU preconditioner...")
+            ilu = spla.spilu(a.tocsc(), drop_tol=1e-4, fill_factor=10)
+            M = spla.LinearOperator(a.shape, matvec=ilu.solve)
+            logger.info("ILU preconditioner built in %.2fs", time.perf_counter() - ilu_start)
+        elif precondition == "jacobi":
+            # Simple Jacobi (diagonal) preconditioner
+            logger.info("Using Jacobi (diagonal) preconditioner")
+            diag = 1.0 / a.diagonal()
+            M = spla.LinearOperator(a.shape, matvec=lambda x: diag * x)
+        elif precondition == "none":
+            logger.info("No preconditioner")
+            M = None
+        else:
+            logger.warning("Unknown preconditioner %r, falling back to no preconditioner", precondition)
+            M = None
+
+        x, info = spla.cg(a, b, rtol=rtol, atol=0.0, maxiter=10000, M=M)
         if info != 0:
             logger.error("CG solver failed%s: info=%s, elapsed=%.2fs", label, info, time.perf_counter() - start)
             raise RuntimeError(f"CG solver did not converge, info={info}.")
