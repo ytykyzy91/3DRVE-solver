@@ -1,5 +1,11 @@
 from __future__ import annotations
 
+import sys
+
+# Print IMMEDIATELY before any heavy imports
+print("RVE-VAM loading (imports may take 30-60 seconds on Python 3.14)...", flush=True)
+print(f"Python version: {sys.version}", flush=True)
+
 import argparse
 import logging
 from dataclasses import replace
@@ -87,7 +93,9 @@ def _build_macro_analysis(args: argparse.Namespace, config: dict):
 
 
 def main(argv: list[str] | None = None) -> int:
+    print("RVE-VAM: Starting up...", flush=True)
     args = build_parser().parse_args(argv)
+    print(f"RVE-VAM: Setting up logging to {args.output}", flush=True)
     log_path = setup_logging(args.log_file or (args.output / "rve_vam.log"), args.log_level)
     logger = logging.getLogger(__name__)
     logger.info("RVE-VAM command started")
@@ -100,13 +108,13 @@ def main(argv: list[str] | None = None) -> int:
     config = load_json(args.materials)
     mapping = build_phase_mapping(config, mesh.material_ids, explicit_map)
 
-    print(f"Log file: {log_path}")
-    print(f"Mesh: {mesh.n_points} points, {mesh.n_cells} {mesh.cell_type} cells")
-    print(f"Bounds: min={mesh.bounds[0].tolist()}, max={mesh.bounds[1].tolist()}")
-    print(f"Material counts: {mesh.material_counts}")
-    print("Material mapping:")
+    print(f"Log file: {log_path}", flush=True)
+    print(f"Mesh: {mesh.n_points} points, {mesh.n_cells} {mesh.cell_type} cells", flush=True)
+    print(f"Bounds: min={mesh.bounds[0].tolist()}, max={mesh.bounds[1].tolist()}", flush=True)
+    print(f"Material counts: {mesh.material_counts}", flush=True)
+    print("Material mapping:", flush=True)
     for mid, item in mapping.as_metadata().items():
-        print(f"  {mid} -> {item['phase']} -> {item['material']}")
+        print(f"  {mid} -> {item['phase']} -> {item['material']}", flush=True)
 
     if args.summary_only:
         logger.info("Summary-only mode completed")
@@ -147,27 +155,27 @@ def main(argv: list[str] | None = None) -> int:
         else:
             logger.info("Skipping homogenization after fields analysis. Use --fields-with-homogenization to write stiffness.json/csv.")
         written = [item for item in result.field_outputs if item.get("vtu_path")]
-        print(f"Macro-strain summary: {result.summary_path}")
-        print(f"VTU field files written: {len(written)}")
+        print(f"Macro-strain summary: {result.summary_path}", flush=True)
+        print(f"VTU field files written: {len(written)}", flush=True)
         if json_path and csv_path:
-            print(f"Wrote {json_path}")
-            print(f"Wrote {csv_path}")
+            print(f"Wrote {json_path}", flush=True)
+            print(f"Wrote {csv_path}", flush=True)
         else:
-            print("Skipped stiffness.json/csv. Add --fields-with-homogenization to generate them in fields mode.")
-        print(f"Diagnostics: {result.diagnostics}")
-        print(f"Log file: {log_path}")
+            print("Skipped stiffness.json/csv. Add --fields-with-homogenization to generate them in fields mode.", flush=True)
+        print(f"Diagnostics: {result.diagnostics}", flush=True)
+        print(f"Log file: {log_path}", flush=True)
         logger.info("RVE-VAM command completed successfully")
         logging.shutdown()
         return 0
 
     result = run_homogenization(options)
     json_path, csv_path = write_outputs(result, args.output)
-    print(f"Solver residuals: {result.solver_residuals}")
-    print(f"Symmetry relative error: {result.diagnostics['symmetry_relative_error']:.6e}")
-    print(f"Diagnostics: {result.diagnostics}")
-    print(f"Wrote {json_path}")
-    print(f"Wrote {csv_path}")
-    print(f"Log file: {log_path}")
+    print(f"Solver residuals: {result.solver_residuals}", flush=True)
+    print(f"Symmetry relative error: {result.diagnostics['symmetry_relative_error']:.6e}", flush=True)
+    print(f"Diagnostics: {result.diagnostics}", flush=True)
+    print(f"Wrote {json_path}", flush=True)
+    print(f"Wrote {csv_path}", flush=True)
+    print(f"Log file: {log_path}", flush=True)
     logger.info("RVE-VAM command completed successfully")
     logging.shutdown()
     return 0
