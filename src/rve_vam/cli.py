@@ -53,6 +53,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--field-prefix", default="macro_strain", help="Prefix for VTU field files")
     parser.add_argument("--log-file", type=Path, help="Log file path; default is OUTPUT/rve_vam.log")
     parser.add_argument("--log-level", default="INFO", choices=["DEBUG", "INFO", "WARNING", "ERROR"], help="Logging level")
+    parser.add_argument("--no-parallel", action="store_true", help="Disable parallel solving of 6 homogenization cases")
+    parser.add_argument("--parallel-workers", default=6, type=int, help="Number of parallel workers for homogenization (default: 6, one per case)")
     return parser
 
 
@@ -141,6 +143,8 @@ def main(argv: list[str] | None = None) -> int:
         stiffness_cache_size=args.stiffness_cache_size,
         stiffness_cache_decimals=args.stiffness_cache_decimals,
         macro_strain_analysis=macro_analysis,
+        parallel=not args.no_parallel,
+        parallel_workers=args.parallel_workers,
         log_file=log_path,
         log_level=args.log_level,
     )

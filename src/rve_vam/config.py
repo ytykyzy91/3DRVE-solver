@@ -44,5 +44,7 @@ class SolverOptions:
     stiffness_cache_decimals: int = 12
     macro_strain_analysis: MacroStrainAnalysisOptions | None = None
     affine_origin: str = "zero"
+    parallel: bool = True
+    parallel_workers: int = 6
     log_file: Path | None = None
     log_level: str = "INFO"
