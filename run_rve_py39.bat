@@ -61,28 +61,28 @@ python -u -c "import numpy as np; from pathlib import Path; from rve_vam.materia
 goto :end
 
 :run
-python -u -m rve_vam.cli --mesh "%MESH%" --materials "%MATERIALS%" --output "%OUTPUT%" --solver cg --assembly-mode reduced --assembly-chunk-size 20000 --stiffness-cache-size 4096
+python -u -m rve_vam.cli --mesh "%MESH%" --materials "%MATERIALS%" --output "%OUTPUT%" --solver splu --assembly-mode reduced --assembly-chunk-size 20000 --stiffness-cache-size 4096
 goto :end
 
 :large
 REM Recommended mode for 1,000,000-scale hexahedral meshes.
 REM Increase --assembly-chunk-size if RAM is sufficient; reduce it if memory pressure is high.
-python -u -m rve_vam.cli --mesh "%MESH%" --materials "%MATERIALS%" --output "%OUTPUT%" --solver cg --assembly-mode reduced --assembly-chunk-size 50000 --stiffness-cache-size 20000
+python -u -m rve_vam.cli --mesh "%MESH%" --materials "%MATERIALS%" --output "%OUTPUT%" --solver splu --assembly-mode reduced --assembly-chunk-size 50000 --stiffness-cache-size 20000
 goto :end
 
 :fields
 REM Use Defs.Composite.LocalFieldsRecovery.MacroStrain from MATERIALS and write VTU field results.
-python -u -m rve_vam.cli --mesh "%MESH%" --materials "%MATERIALS%" --output "%OUTPUT%" --solver cg --assembly-mode reduced --assembly-chunk-size 20000 --stiffness-cache-size 4096 --write-fields --load-steps 1 --field-output-dir "%OUTPUT%\fields" --field-prefix macro_strain
+python -u -m rve_vam.cli --mesh "%MESH%" --materials "%MATERIALS%" --output "%OUTPUT%" --solver splu --assembly-mode reduced --assembly-chunk-size 20000 --stiffness-cache-size 4096 --write-fields --load-steps 1 --field-output-dir "%OUTPUT%\fields" --field-prefix macro_strain
 goto :end
 
 :fields_large
 REM Large-mesh local-field output. Use --field-output-every to limit VTU file count for many steps.
-python -u -m rve_vam.cli --mesh "%MESH%" --materials "%MATERIALS%" --output "%OUTPUT%" --solver cg --assembly-mode reduced --assembly-chunk-size 50000 --stiffness-cache-size 20000 --write-fields --load-steps 1 --field-output-dir "%OUTPUT%\fields" --field-prefix macro_strain
+python -u -m rve_vam.cli --mesh "%MESH%" --materials "%MATERIALS%" --output "%OUTPUT%" --solver splu --assembly-mode reduced --assembly-chunk-size 50000 --stiffness-cache-size 20000 --write-fields --load-steps 1 --field-output-dir "%OUTPUT%\fields" --field-prefix macro_strain
 goto :end
 
 :fields_homogenization
 REM Write VTU fields and also run 6-direction homogenization for stiffness.json/csv.
-python -u -m rve_vam.cli --mesh "%MESH%" --materials "%MATERIALS%" --output "%OUTPUT%" --solver cg --assembly-mode reduced --assembly-chunk-size 20000 --stiffness-cache-size 4096 --write-fields --fields-with-homogenization --load-steps 1 --field-output-dir "%OUTPUT%\fields" --field-prefix macro_strain
+python -u -m rve_vam.cli --mesh "%MESH%" --materials "%MATERIALS%" --output "%OUTPUT%" --solver splu --assembly-mode reduced --assembly-chunk-size 20000 --stiffness-cache-size 4096 --write-fields --fields-with-homogenization --load-steps 1 --field-output-dir "%OUTPUT%\fields" --field-prefix macro_strain
 goto :end
 
 :help

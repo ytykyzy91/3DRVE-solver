@@ -23,6 +23,7 @@ def solve_linear_system(
     rhs: np.ndarray,
     method: str = "spsolve",
     context: str = "",
+    rtol: float = 1e-8,
 ) -> LinearSolveResult:
     a = matrix.tocsr()
     b = np.asarray(rhs, dtype=float)
@@ -31,13 +32,35 @@ def solve_linear_system(
         logger.info("Skipping empty linear solve%s: shape=%s, nnz=%d", label, a.shape, a.nnz)
         return LinearSolveResult(x=np.zeros(0, dtype=float), residual_norm=0.0, info=0)
 
-    logger.info("Starting linear solve%s: method=%s, shape=%s, nnz=%d, rhs_norm=%.6e", label, method, a.shape, a.nnz, float(np.linalg.norm(b)))
+    # Handle multi-RHS: shape (n, nrhs)
+    is_multi_rhs = b.ndim == 2 and b.shape[1] > 1
+    if is_multi_rhs:
+        b_norm = float(np.linalg.norm(b, axis=0).max())
+    else:
+        b_norm = float(np.linalg.norm(b))
+
+    logger.info("Starting linear solve%s: method=%s, shape=%s, nnz=%d, rhs_norm=%.6e, multi_rhs=%s",
+                label, method, a.shape, a.nnz, b_norm, is_multi_rhs)
     start = time.perf_counter()
+
     if method == "spsolve":
         x = spla.spsolve(a, b)
         info = None
+    elif method == "splu":
+        # Sparse LU factorization + solve for single or multiple RHS
+        lu_start = time.perf_counter()
+        logger.info("Factorizing Sparse LU...")
+        lu = spla.splu(a.tocsc())
+        lu_time = time.perf_counter() - lu_start
+        logger.info("Sparse LU factorization completed in %.2fs", lu_time)
+        solve_start = time.perf_counter()
+        x = lu.solve(b)
+        solve_time = time.perf_counter() - solve_start
+        logger.info("Backward/forward substitution completed in %.2fs", solve_time)
+        info = None
     elif method == "cg":
-        x, info = spla.cg(a, b, rtol=1e-10, atol=0.0, maxiter=max(1000, 2 * a.shape[0]))
+        # Use relaxed tolerance for homogenization
+        x, info = spla.cg(a, b, rtol=rtol, atol=0.0, maxiter=10000)
         if info != 0:
             logger.error("CG solver failed%s: info=%s, elapsed=%.2fs", label, info, time.perf_counter() - start)
             raise RuntimeError(f"CG solver did not converge, info={info}.")

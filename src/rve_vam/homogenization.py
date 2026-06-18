@@ -119,6 +119,41 @@ def _solve_single_case(
     return case_idx, sigma_avg, solve.residual_norm, volume
 
 
+def _solve_multiple_cases(
+    K: sp.csr_matrix,
+    rhs_multi: np.ndarray,
+    T: sp.csr_matrix,
+    free: np.ndarray,
+    mesh: Mesh,
+    phase_mapping: PhaseMapping,
+    affine_reference: np.ndarray | None,
+) -> tuple[list[np.ndarray], list[float], list[float]]:
+    """Solve multiple RHS at once using direct solver (multi-RHS optimization)."""
+    columns: list[np.ndarray] = []
+    residuals: list[float] = []
+    volumes: list[float] = []
+
+    # Solve all 6 RHS at once
+    solve = solve_linear_system(K, rhs_multi, method="splu", context="homogenization multi-RHS")
+    q_all = np.zeros((T.shape[1], 6), dtype=float)
+    q_all[free, :] = solve.x
+
+    # Post-process each case
+    for case_idx, macro_strain in enumerate(MACRO_STRAINS):
+        label = MACRO_STRAIN_LABELS[case_idx]
+        displacement = affine_displacement(mesh.points, macro_strain, reference_point=affine_reference) + T @ q_all[:, case_idx]
+        sigma_avg, volume = average_stress(mesh, phase_mapping, displacement)
+
+        # Calculate per-case residual
+        residual = np.linalg.norm(K @ q_all[free, case_idx] - rhs_multi[:, case_idx]) / max(1.0, np.linalg.norm(rhs_multi[:, case_idx]))
+        columns.append(sigma_avg)
+        residuals.append(float(residual))
+        volumes.append(volume)
+        logger.info("Completed homogenization reduced solve %d/6: %s, residual=%.6e", case_idx + 1, label, residual)
+
+    return columns, residuals, volumes
+
+
 def _solve_from_reduced_assembly(
     reduced: ReducedAssemblyResult,
     pbc_map: PeriodicDofMap,
@@ -135,6 +170,12 @@ def _solve_from_reduced_assembly(
     T = pbc_map.transformation
     free = pbc_map.free_reduced_dofs
 
+    # For direct solvers: use multi-RHS optimization (fastest)
+    if solver == "splu":
+        logger.info("Using Sparse LU multi-RHS solve for all 6 cases")
+        return _solve_multiple_cases(reduced.K, reduced.macro_rhs, T, free, mesh, phase_mapping, affine_reference)
+
+    # For iterative solvers: use parallel or serial
     if parallel and max_workers > 1:
         logger.info("Starting PARALLEL homogenization solves with %d workers", max_workers)
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
