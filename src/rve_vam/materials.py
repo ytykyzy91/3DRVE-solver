@@ -125,7 +125,7 @@ def auto_material_id_to_phase(material_ids: np.ndarray, phases: list[str]) -> di
 
     n = len(phases)
     if ids == list(range(n)):
-        return dict(zip(ids, phases, strict=True))
+        return dict(zip(ids, phases))
     raise ValueError(
         f"Ambiguous material IDs {ids}; expected zero-based {list(range(n))} or one-based IDs "
         "1:matrix, 2:reinforcement, 3:interphase. Provide an explicit material ID map."

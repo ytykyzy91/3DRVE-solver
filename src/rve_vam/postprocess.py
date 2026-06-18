@@ -66,7 +66,7 @@ def write_stiffness_csv(result: HomogenizationResult, path: Path | str) -> None:
         writer = csv.writer(stream)
         writer.writerow(["Homogenized stiffness matrix C"])
         writer.writerow([""] + VOIGT_ORDER)
-        for label, row in zip(VOIGT_ORDER, result.stiffness, strict=True):
+        for label, row in zip(VOIGT_ORDER, result.stiffness):
             writer.writerow([label] + [f"{float(value):.16g}" for value in row])
         writer.writerow([])
         writer.writerow(["Engineering constants from compliance S = inv(C)"])
