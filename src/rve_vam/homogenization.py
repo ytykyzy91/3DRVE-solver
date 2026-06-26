@@ -111,7 +111,7 @@ def _solve_single_case(
         rhs,
         method=solver,
         context=f"homogenization {case_idx + 1}/6 {label}",
-        rtol=1e-5,
+        rtol=1e-4,
     )
     q = np.zeros(T.shape[1], dtype=float)
     q[free] = solve.x

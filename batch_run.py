@@ -57,9 +57,9 @@ def run_single_case(
     output_dir: Path | None = None,
     write_fields: bool = True,
     solver: str = "cg",
-    solver_rtol: float = 1e-5,
+    solver_rtol: float = 1e-4,
     parallel: bool = True,
-    parallel_workers: int = 2,
+    parallel_workers: int = 6,
 ) -> dict:
     """执行单个RVE算例计算
 
