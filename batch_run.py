@@ -117,6 +117,7 @@ def run_single_case(
     else:
         cmd.extend([
             "--write-fields",
+            "--fields-with-homogenization",  # 同时输出刚度矩阵文件
             "--load-steps", "1",
             "--field-output-dir", str(out_dir / "fields"),
             "--field-prefix", "macro_strain",

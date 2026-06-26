@@ -23,7 +23,7 @@ def solve_linear_system(
     rhs: np.ndarray,
     method: str = "spsolve",
     context: str = "",
-    rtol: float = 1e-8,
+    rtol: float = 5e-4,
 ) -> LinearSolveResult:
     a = matrix.tocsr()
     b = np.asarray(rhs, dtype=float)

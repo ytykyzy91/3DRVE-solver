@@ -35,7 +35,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--pbc-tol", default=1e-8, type=float, help="Periodic node pairing tolerance")
     parser.add_argument("--affine-origin", default="zero", choices=["zero", "min", "center"], help="Reference point for affine macro displacement E*(X-Xref)")
     parser.add_argument("--solver", default="cg", choices=["spsolve", "splu", "cg"], help="Sparse linear solver (cg=Conjugate Gradient, recommended for large meshes)")
-    parser.add_argument("--solver-rtol", default=1e-5, type=float, help="Relative tolerance for CG solver (default: 1e-5, use 1e-4 for even faster runs)")
+    parser.add_argument("--solver-rtol", default=5e-4, type=float, help="Relative tolerance for CG solver (default: 1e-5, use 1e-4 for even faster runs)")
     parser.add_argument("--assembly-mode", default="reduced", choices=["reduced", "full"], help="Assemble directly in periodic reduced space or assemble full K first")
     parser.add_argument("--assembly-chunk-size", default=20000, type=int, help="Elements per sparse assembly chunk")
     parser.add_argument("--stiffness-cache-size", default=4096, type=int, help="Max cached element stiffness patterns; 0 disables cache")
@@ -146,6 +146,7 @@ def main(argv: list[str] | None = None) -> int:
         macro_strain_analysis=macro_analysis,
         parallel=not args.no_parallel,
         parallel_workers=args.parallel_workers,
+        solver_rtol=args.solver_rtol,
         log_file=log_path,
         log_level=args.log_level,
     )

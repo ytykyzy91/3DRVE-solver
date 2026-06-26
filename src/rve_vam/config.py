@@ -46,5 +46,6 @@ class SolverOptions:
     affine_origin: str = "zero"
     parallel: bool = True
     parallel_workers: int = 6
+    solver_rtol: float = 1e-5
     log_file: Path | None = None
     log_level: str = "INFO"
