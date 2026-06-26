@@ -161,7 +161,7 @@ def macro_strain_from_legacy_material_config(
         ]
     )
     return MacroStrainAnalysisOptions(
-        cases=(MacroStrainCase(name="legacy_macro_strain", strain=strain),),
+        cases=(MacroStrainCase(name="fields", strain=strain),),
         load_steps=_validate_steps(load_steps),
         field_output=field_output,
         source="Defs.Composite.LocalFieldsRecovery.MacroStrain",

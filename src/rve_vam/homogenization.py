@@ -461,7 +461,7 @@ def run_macro_strain_analysis(options: SolverOptions) -> MacroStrainAnalysisResu
                 logger.info("Recovering local fields for case=%s step=%d", case.name, step)
                 fields = recover_local_fields(mesh, phase_mapping, displacement)
                 average_stress = fields.average_stress
-                output_path = output_dir / f"{analysis.field_output.prefix}_{case.name}_step{step:04d}.vtu"
+                output_path = output_dir / f"{analysis.field_output.prefix}_step{step:04d}.vtu"
                 logger.info("Writing VTU fields: %s", output_path)
                 write_result_vtu(
                     mesh,
