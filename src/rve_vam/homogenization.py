@@ -85,7 +85,7 @@ def solve_macro_case(
     q = np.zeros(K_reduced.shape[0], dtype=float)
     K_free = K_reduced[free][:, free].tocsr()
     rhs_free = np.asarray(rhs_reduced[free], dtype=float)
-    solve = solve_linear_system(K_free, rhs_free, method=solver, context="homogenization/full")
+    solve = solve_linear_system(K_free, rhs_free, method=solver, context="homogenization/full", rtol=1e-5)
     q[free] = solve.x
     displacement = u_macro + T @ q
     sigma_avg, volume = average_stress(mesh, phase_mapping, displacement)
@@ -111,6 +111,7 @@ def _solve_single_case(
         rhs,
         method=solver,
         context=f"homogenization {case_idx + 1}/6 {label}",
+        rtol=1e-5,
     )
     q = np.zeros(T.shape[1], dtype=float)
     q[free] = solve.x
@@ -134,7 +135,7 @@ def _solve_multiple_cases(
     volumes: list[float] = []
 
     # Solve all 6 RHS at once
-    solve = solve_linear_system(K, rhs_multi, method="splu", context="homogenization multi-RHS")
+    solve = solve_linear_system(K, rhs_multi, method="splu", context="homogenization multi-RHS", rtol=1e-5)
     q_all = np.zeros((T.shape[1], 6), dtype=float)
     q_all[free, :] = solve.x
 

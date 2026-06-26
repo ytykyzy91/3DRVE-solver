@@ -59,8 +59,26 @@ def solve_linear_system(
         logger.info("Backward/forward substitution completed in %.2fs", solve_time)
         info = None
     elif method == "cg":
-        # Use relaxed tolerance for homogenization
-        x, info = spla.cg(a, b, rtol=rtol, atol=0.0, maxiter=10000)
+        # Simple CG without preconditioner for robustness
+        # Add callback to track progress
+        iters = [0]
+        b_norm = float(np.linalg.norm(b))
+        last_print = [0.0]
+        start_time = time.perf_counter()
+
+        def callback(xk):
+            iters[0] += 1
+            # Print residual every 50 iterations or every 10 seconds
+            current_time = time.perf_counter()
+            if iters[0] % 50 == 0 or current_time - last_print[0] >= 10:
+                r = a @ xk - b
+                rel_res = float(np.linalg.norm(r)) / max(1.0, b_norm)
+                logger.info("CG iter %d: rel_res = %.2e, elapsed = %.1fs",
+                           iters[0], rel_res, current_time - start_time)
+                last_print[0] = current_time
+
+        x, info = spla.cg(a, b, rtol=rtol, atol=0.0, maxiter=10000, callback=callback)
+        logger.info("CG converged in %d iterations, final rtol=%.2e", iters[0], rtol)
         if info != 0:
             logger.error("CG solver failed%s: info=%s, elapsed=%.2fs", label, info, time.perf_counter() - start)
             raise RuntimeError(f"CG solver did not converge, info={info}.")

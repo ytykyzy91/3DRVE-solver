@@ -57,8 +57,9 @@ def run_single_case(
     output_dir: Path | None = None,
     write_fields: bool = True,
     solver: str = "cg",
+    solver_rtol: float = 1e-5,
     parallel: bool = True,
-    parallel_workers: int = 6,
+    parallel_workers: int = 2,
 ) -> dict:
     """执行单个RVE算例计算
 
@@ -102,6 +103,7 @@ def run_single_case(
         "--materials", str(material_path),
         "--output", str(out_dir),
         "--solver", solver,
+        "--solver-rtol", str(solver_rtol),
     ]
 
     if not parallel:
@@ -162,8 +164,9 @@ def main():
     parser.add_argument("--limit", type=int, default=None, help="仅处理前N个算例，用于测试")
     parser.add_argument("--no-fields", action="store_true", help="跳过场输出计算，只计算刚度矩阵")
     parser.add_argument("--solver", default="cg", choices=["cg", "splu", "spsolve"], help="求解器类型")
+    parser.add_argument("--solver-rtol", default=1e-5, type=float, help="CG求解器相对残差阈值 (default: 1e-5, 1e-4更快但精度稍低)")
     parser.add_argument("--no-parallel", action="store_true", help="禁用并行求解")
-    parser.add_argument("--parallel-workers", default=6, type=int, help="并行worker数量")
+    parser.add_argument("--parallel-workers", default=2, type=int, help="并行worker数量 (大网格推荐2-3个，避免内存带宽瓶颈)")
 
     args = parser.parse_args()
 
@@ -209,6 +212,7 @@ def main():
                 output_dir=args.output_dir,
                 write_fields=not args.no_fields,
                 solver=args.solver,
+                solver_rtol=args.solver_rtol,
                 parallel=not args.no_parallel,
                 parallel_workers=args.parallel_workers,
             )
