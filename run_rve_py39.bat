@@ -32,10 +32,10 @@ if errorlevel 1 (
 
 set "PYTHONPATH=%CD%\src;%PYTHONPATH%"
 set PYTHONUNBUFFERED=1
-set "MESH=%CD%\example\case0001_fix.vtu"
-if not exist "%MESH%" set "MESH=%CD%\example\case0001_fix0.vtu"
+set "MESH=%CD%\example\XiewenTtisu_fixed.vtu"
+REM if not exist "%MESH%" set "MESH=%CD%\example\case0001_fix0.vtu"
 set "MATERIALS=%CD%\example\user_RVE_analysis.json"
-set "OUTPUT=%CD%\outputs\case0001"
+set "OUTPUT=%CD%\outputs\XiewenTtisu_fixed"
 
 if "%~1"=="" goto :help
 if /I "%~1"=="help" goto :help
@@ -72,7 +72,7 @@ goto :end
 
 :fields
 REM Use Defs.Composite.LocalFieldsRecovery.MacroStrain from MATERIALS and write VTU field results.
-python -u -m rve_vam.cli --mesh "%MESH%" --materials "%MATERIALS%" --output "%OUTPUT%" --solver splu --assembly-mode reduced --assembly-chunk-size 20000 --stiffness-cache-size 4096 --write-fields --load-steps 1 --field-output-dir "%OUTPUT%\fields" --field-prefix macro_strain
+python -u -m rve_vam.cli --mesh "%MESH%" --materials "%MATERIALS%" --output "%OUTPUT%" --solver cg --assembly-mode reduced --assembly-chunk-size 20000 --stiffness-cache-size 4096 --write-fields --load-steps 1 --field-output-dir "%OUTPUT%\fields"
 goto :end
 
 :fields_large

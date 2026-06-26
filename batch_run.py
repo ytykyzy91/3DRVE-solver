@@ -27,17 +27,15 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import os
+import subprocess
 import sys
 import time
 from pathlib import Path
 
-# Add src to path
+# Add src to path for imports
 src_path = Path(__file__).parent / "src"
 sys.path.insert(0, str(src_path))
-
-from rve_vam.homogenization import run_homogenization, run_macro_strain_analysis
-from rve_vam.config import SolverOptions
-from rve_vam.utils import setup_logging
 
 
 def find_case_folders(root_dir: Path) -> list[Path]:
@@ -59,8 +57,6 @@ def run_single_case(
     output_dir: Path | None = None,
     write_fields: bool = True,
     solver: str = "cg",
-    solver_rtol: float = 1e-6,
-    cg_preconditioner: str = "ilu",
     parallel: bool = True,
     parallel_workers: int = 6,
 ) -> dict:
@@ -71,8 +67,6 @@ def run_single_case(
         output_dir: 输出目录，默认在 case_dir / "outputs"
         write_fields: 是否输出场文件VTU，默认True
         solver: 求解器类型: cg, splu, spsolve
-        solver_rtol: CG求解器相对残差
-        cg_preconditioner: 预条件器: ilu, jacobi, none
         parallel: 是否启用并行
         parallel_workers: 并行worker数量
 
@@ -98,93 +92,54 @@ def run_single_case(
         out_dir = output_dir / case_dir.name
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    # 设置日志
-    log_path = setup_logging(out_dir / "rve.log", "INFO")
-    logger = logging.getLogger(__name__)
-    logger.info("=" * 60)
-    logger.info(f"开始计算: {case_dir.name}")
-    logger.info(f"网格文件: {mesh_path.name}")
-    logger.info(f"输出目录: {out_dir}")
-    logger.info(f"求解器: {solver}")
-    logger.info(f"写场输出: {write_fields}")
-    logger.info("=" * 60)
+    print(f"  网格文件: {mesh_path.name}")
+    print(f"  输出目录: {out_dir}")
 
-    # 构建求解选项
-    options = SolverOptions(
-        mesh_path=mesh_path,
-        material_json_path=material_path,
-        output_dir=out_dir,
-        material_mapping_mode="auto",
-        material_id_map=None,
-        pbc_tolerance=1e-8,
-        solver=solver,
-        symmetrize=True,
-        assembly_chunk_size=20000,
-        assembly_mode="reduced",
-        use_stiffness_cache=True,
-        stiffness_cache_size=4096,
-        stiffness_cache_decimals=12,
-        affine_origin="zero",
-        macro_strain_analysis=None,  # None表示只做均质化
-        parallel=parallel,
-        parallel_workers=parallel_workers,
-        solver_rtol=solver_rtol,
-        cg_preconditioner=cg_preconditioner,
-        log_file=log_path,
-        log_level="INFO",
+    # 构建命令行参数
+    cmd = [
+        sys.executable, "-m", "rve_vam.cli",
+        "--mesh", str(mesh_path),
+        "--materials", str(material_path),
+        "--output", str(out_dir),
+        "--solver", solver,
+    ]
+
+    if not parallel:
+        cmd.append("--no-parallel")
+    else:
+        cmd.extend(["--parallel-workers", str(parallel_workers)])
+
+    if not write_fields:
+        # 不写场文件，只做均质化
+        pass
+    else:
+        cmd.extend([
+            "--write-fields",
+            "--load-steps", "1",
+            "--field-output-dir", str(out_dir / "fields"),
+            "--field-prefix", "macro_strain",
+        ])
+
+    # 重置 logging handlers，避免跨算例问题
+    for handler in list(logging.root.handlers):
+        logging.root.removeHandler(handler)
+
+    # 执行命令
+    env = dict(os.environ)
+    env["PYTHONPATH"] = str(src_path) + os.pathsep + env.get("PYTHONPATH", "")
+
+    result = subprocess.run(
+        cmd,
+        env=env,
+        cwd=str(Path(__file__).parent),
+        capture_output=False,
+        text=True,
     )
 
-    # 执行均质化
-    logger.info("开始执行均质化计算...")
-    result = run_homogenization(options)
-    logger.info("均质化完成")
-    logger.info(f"刚度矩阵已写入: {out_dir}")
-
-    # 场输出
-    if write_fields:
-        logger.info("开始计算场输出...")
-        from rve_vam.macro_strain import macro_strain_from_legacy_material_config, FieldOutputOptions
-
-        field_options = SolverOptions(
-            mesh_path=mesh_path,
-            material_json_path=material_path,
-            output_dir=out_dir,
-            material_mapping_mode="auto",
-            material_id_map=None,
-            pbc_tolerance=1e-8,
-            solver=solver,
-            symmetrize=True,
-            assembly_chunk_size=20000,
-            assembly_mode="reduced",
-            use_stiffness_cache=True,
-            stiffness_cache_size=4096,
-            stiffness_cache_decimals=12,
-            affine_origin="zero",
-            macro_strain_analysis=macro_strain_from_legacy_material_config(
-                config=json.load(open(material_path)),
-                load_steps=1,
-                field_output=FieldOutputOptions(
-                    enabled=True,
-                    output_every=1,
-                    output_dir=out_dir / "fields",
-                    prefix="macro_strain",
-                ),
-                strain_convention="engineering_shear",
-            ),
-            parallel=parallel,
-            parallel_workers=parallel_workers,
-            solver_rtol=solver_rtol,
-            cg_preconditioner=cg_preconditioner,
-            log_file=log_path,
-            log_level="INFO",
-        )
-        field_result = run_macro_strain_analysis(field_options)
-        logger.info(f"场输出完成，文件数: {len(field_result.field_outputs)}")
-    else:
-        field_result = None
-
     elapsed = time.time() - start_time
-    logger.info(f"{case_dir.name} 计算完成! 总耗时: {elapsed:.1f} 秒")
+
+    if result.returncode != 0:
+        raise RuntimeError(f"计算失败，返回码: {result.returncode}")
 
     return {
         "case_name": case_dir.name,
@@ -193,8 +148,6 @@ def run_single_case(
         "output_dir": str(out_dir),
         "stiffness_json": str(out_dir / "stiffness.json"),
         "stiffness_csv": str(out_dir / "stiffness.csv"),
-        "diagnostics": result.diagnostics,
-        "solver_residuals": result.solver_residuals,
     }
 
 
@@ -209,12 +162,12 @@ def main():
     parser.add_argument("--limit", type=int, default=None, help="仅处理前N个算例，用于测试")
     parser.add_argument("--no-fields", action="store_true", help="跳过场输出计算，只计算刚度矩阵")
     parser.add_argument("--solver", default="cg", choices=["cg", "splu", "spsolve"], help="求解器类型")
-    parser.add_argument("--solver-rtol", default=1e-6, type=float, help="CG求解器相对残差")
-    parser.add_argument("--cg-preconditioner", default="ilu", choices=["ilu", "jacobi", "none"], help="CG预条件器")
     parser.add_argument("--no-parallel", action="store_true", help="禁用并行求解")
     parser.add_argument("--parallel-workers", default=6, type=int, help="并行worker数量")
 
     args = parser.parse_args()
+
+    import os
 
     root_dir: Path = args.root
     if not root_dir.exists():
@@ -256,8 +209,6 @@ def main():
                 output_dir=args.output_dir,
                 write_fields=not args.no_fields,
                 solver=args.solver,
-                solver_rtol=args.solver_rtol,
-                cg_preconditioner=args.cg_preconditioner,
                 parallel=not args.no_parallel,
                 parallel_workers=args.parallel_workers,
             )
