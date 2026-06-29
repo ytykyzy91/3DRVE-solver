@@ -122,7 +122,7 @@ python -m pip install numpy scipy meshio pytest
 python -m pip install -e .
 ```
 
-## Windows 一键运行
+## Windows 一键运行（单次计算）
 
 项目根目录下提供了：
 
@@ -196,6 +196,117 @@ run_rve_py39.bat large
 ```
 
 如果内存不足，请降低 `--assembly-chunk-size`；如果内存充足，可提高该值来减少 chunk 数量。
+
+---
+
+## 批量计算
+
+项目提供了 `batch_run.py` 用于批量计算多个 RVE 算例。
+
+### 批处理目录结构
+
+```text
+root_dir/
+├── case0001/
+│   ├── *.vtu                          # 网格文件
+│   ├── user_RVE_analysis.json         # 材料配置
+│   └── outputs/                       # 输出目录（自动创建）
+│       ├── stiffness.json
+│       ├── stiffness.csv
+│       └── ...
+├── case0002/
+│   ├── *.vtu
+│   └── user_RVE_analysis.json
+└── ...
+```
+
+### 批处理示例
+
+#### 1. 批量计算所有算例
+
+```bat
+cd /d D:\ClaudeCode\RVE_VAM
+set PYTHONPATH=%CD%\src
+call conda activate py39
+python batch_run.py --root C:\3DRVE_dataset\Weave2D\woven_weave_2d_batch0001 --no-fields
+```
+
+#### 2. 只计算前N个算例（测试用）
+
+```bat
+python batch_run.py --root C:\3DRVE_dataset\Weave2D\woven_weave_2d_batch0001 --no-fields --limit 3
+```
+
+#### 3. 从第N个算例开始续算
+
+```bat
+REM 从第51个算例开始
+python batch_run.py --root C:\3DRVE_dataset\Weave2D\woven_weave_2d_batch0001 --no-fields --start-from 51
+```
+
+#### 4. 智能续算（自动跳过已完成的算例）⭐
+
+```bat
+python batch_run.py --root C:\3DRVE_dataset\Weave2D\woven_weave_2d_batch0001 --no-fields --resume
+```
+
+#### 5. 组合使用：从第51个开始 + 只算10个 + 自动跳过已完成的
+
+```bat
+python batch_run.py --root C:\3DRVE_dataset\Weave2D\woven_weave_2d_batch0001 --no-fields --start-from 51 --limit 10 --resume
+```
+
+#### 6. 推荐的大规模计算配置（使用 Numba 加速）
+
+```bat
+REM 2个并行worker + Numba加速 + 5%残差
+python batch_run.py --root C:\3DRVE_dataset\Weave2D\woven_weave_2d_batch0001 --no-fields --parallel-workers 2 --solver-rtol 5e-2 --resume
+```
+
+### 批处理参数说明
+
+| 参数 | 说明 | 默认值 | 示例 |
+|------|------|--------|------|
+| `--root` | **必填**，包含所有算例的根目录 | - | `--root C:\data\batch0001` |
+| `--output-dir` | 统一输出目录，默认每个算例在自己的 `outputs/` 目录下 | None | `--output-dir C:\results\batch0001` |
+| `--limit` | 仅处理前N个算例，用于测试 | None | `--limit 3` |
+| `--start-from` | 从第N个算例开始计算 | 1 | `--start-from 51` |
+| `--resume` | 续算模式，自动跳过已完成的算例（检测 `stiffness.json`） | off | `--resume` |
+| `--no-fields` | 只计算刚度矩阵，不输出 VTU 场文件（更快） | off | `--no-fields` |
+| `--solver` | 求解器类型：`cg`、`splu`、`spsolve` | `cg` | `--solver cg` |
+| `--solver-rtol` | CG 求解器相对残差阈值 | `1e-5` | `--solver-rtol 5e-2` |
+| `--no-parallel` | 禁用并行求解 | off | `--no-parallel` |
+| `--parallel-workers` | 并行 worker 数量（大网格推荐 2-3） | 2 | `--parallel-workers 2` |
+
+### 批处理性能优化建议
+
+| 场景 | 推荐配置 | 说明 |
+|------|----------|------|
+| **调试/小网格** | `--no-parallel --solver-rtol 1e-2` | 串行稳定，日志清晰 |
+| **中等网格 (≤50万)** | `--parallel-workers 2 --solver-rtol 2e-2` | 2个worker，内存带宽友好 |
+| **大网格 (≥50万)** | `--no-parallel --solver-rtol 5e-2` | 串行反而更快，避免内存竞争 |
+| **批量筛选** | `--solver-rtol 5e-2 --resume` | 5%残差 + 自动续算，效率最高 |
+
+> **重要：必须在 py39 环境下运行才能启用 Numba 加速！**
+> 确认日志开头显示 `Python version: 3.9.x` 而不是 3.14.x。
+
+### 批处理输出文件
+
+每个算例完成后会生成：
+
+```text
+case0001/outputs/
+├── stiffness.json          # 完整的计算结果（刚度矩阵、诊断信息等）
+├── stiffness.csv           # 6x6 刚度矩阵（CSV 格式）
+├── rve_vam.log             # 详细日志
+└── rve.log                 # 运行记录
+```
+
+批量计算完成后，根目录会生成：
+
+```text
+root_dir/batch_summary.json  # 批量计算汇总
+```
 
 ## 命令行直接运行
 

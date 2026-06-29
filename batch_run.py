@@ -52,6 +52,28 @@ def find_case_folders(root_dir: Path) -> list[Path]:
     return sorted(cases)
 
 
+def is_case_completed(case_dir: Path, output_dir: Path | None = None) -> bool:
+    """检查算例是否已经完成（通过检查 stiffness.json）"""
+    if output_dir is None:
+        out_dir = case_dir / "outputs"
+    else:
+        out_dir = output_dir / case_dir.name
+    stiffness_json = out_dir / "stiffness.json"
+    return stiffness_json.exists()
+
+
+def filter_completed_cases(cases: list[Path], output_dir: Path | None = None) -> tuple[list[Path], list[Path]]:
+    """过滤出已完成和未完成的算例"""
+    completed = []
+    pending = []
+    for case in cases:
+        if is_case_completed(case, output_dir):
+            completed.append(case)
+        else:
+            pending.append(case)
+    return completed, pending
+
+
 def run_single_case(
     case_dir: Path,
     output_dir: Path | None = None,
@@ -168,6 +190,9 @@ def main():
     parser.add_argument("--solver-rtol", default=1e-5, type=float, help="CG求解器相对残差阈值 (default: 1e-5, 1e-4更快但精度稍低)")
     parser.add_argument("--no-parallel", action="store_true", help="禁用并行求解")
     parser.add_argument("--parallel-workers", default=2, type=int, help="并行worker数量 (大网格推荐2-3个，避免内存带宽瓶颈)")
+    parser.add_argument("--resume", action="store_true", help="续算模式：跳过已完成的算例，从未完成的开始")
+    parser.add_argument("--start-from", type=int, default=1, help="从第N个算例开始计算 (默认: 1，从第一个开始)")
+    parser.add_argument("--rerun-failed", action="store_true", help="重算已失败的算例（通过检查是否有 error.log）")
 
     args = parser.parse_args()
 
@@ -187,9 +212,34 @@ def main():
         print("  - user_RVE_analysis.json (材料配置)")
         sys.exit(1)
 
-    print(f"找到 {len(cases)} 个算例:")
-    for i, case in enumerate(cases, 1):
-        print(f"  {i:2d}. {case.name}")
+    # 先应用 --start-from 过滤
+    if args.start_from > 1:
+        if args.start_from > len(cases):
+            print(f"错误: --start-from={args.start_from} 超出算例总数 ({len(cases)})")
+            sys.exit(1)
+        skip_count = args.start_from - 1
+        print(f"--start-from={args.start_from}, 跳过前 {skip_count} 个算例")
+        cases = cases[skip_count:]
+
+    # 续算模式：过滤已完成的算例
+    if args.resume:
+        completed, pending = filter_completed_cases(cases, args.output_dir)
+        print(f"找到 {len(cases)} 个算例（从第 {args.start_from} 个开始），其中 {len(completed)} 个已完成，{len(pending)} 个待计算")
+        if completed:
+            print(f"已完成的算例:")
+            for i, case in enumerate(completed, 1):
+                print(f"  ✓ {case.name}")
+        if not pending:
+            print("\n所有算例都已完成！")
+            sys.exit(0)
+        cases = pending
+        print(f"\n续算模式：将从以下 {len(cases)} 个算例开始:")
+        for i, case in enumerate(cases, 1):
+            print(f"  {i:2d}. {case.name}")
+    else:
+        print(f"找到 {len(cases)} 个算例（从第 {args.start_from} 个开始）:")
+        for i, case in enumerate(cases, 1):
+            print(f"  {i:2d}. {case.name}")
 
     if args.limit and args.limit < len(cases):
         print(f"\n--limit={args.limit}, 仅处理前 {args.limit} 个算例")
@@ -198,6 +248,8 @@ def main():
     print(f"\n输出场文件: {'是' if not args.no_fields else '否'}")
     print(f"求解器: {args.solver}")
     print(f"并行: {'启用' if not args.no_parallel else '禁用'}")
+    print(f"续算模式: {'是' if args.resume else '否'}")
+    print(f"起始算例: 第 {args.start_from} 个")
     print(f"\n开始计算，共 {len(cases)} 个算例...\n")
 
     # 执行批量计算
